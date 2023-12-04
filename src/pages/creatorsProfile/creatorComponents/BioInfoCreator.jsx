@@ -28,17 +28,11 @@ function BioFigure({ user }) {
     <figure className="info--figures">
       <div className="followers--numbers">
         <span className="numbers">
-          <p className="numbers-count">
-            {user.followers ? (
-              <p className="numbers-count">{user.followers}</p>
-            ) : (
-              <p>0</p>
-            )}
-          </p>
+          <p className="numbers-count">{user.followers || 0}</p>
           <p className="numbers-text">Followers</p>
         </span>
         <span className="numbers">
-          <p className="numbers-count">{user.following}</p>
+          <p className="numbers-count">{user.following || 0}</p>
           <p className="numbers-text">Following</p>
         </span>
       </div>

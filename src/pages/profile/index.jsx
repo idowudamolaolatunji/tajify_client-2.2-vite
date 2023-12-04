@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import ProfileHeader from '../../components/ProfileHeader';
+// import ProfileHeader from '../../components/ProfileHeader';
 import ProfileHero from './profileComponents/ProfileHero';
 import BioInfo from './profileComponents/BioInfo';
 import './profile.css';

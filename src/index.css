@@ -32,7 +32,19 @@ input {
   background-color: rgba(0, 128, 0, 0.25);
   color: #666;
 }
-
+::-webkit-scrollbar {
+  width: 0.8rem;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
 .section {
   padding: 4.8rem 0;
 }
@@ -175,11 +187,12 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
-  .subscription__fee {
-    margin-left: 30px;
-    font-weight: 700;
-  }   
+  /* margin-left: auto; */
 }
+.subscription__fee {
+  margin-left: 30px;
+  font-weight: 700;
+}   
 /* 
 #008001
 #FFC107

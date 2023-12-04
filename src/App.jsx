@@ -6,9 +6,7 @@ import Login from "./components/authentication/Login";
 import BlogDetails from "./pages/blogDetails";
 import WritersProfile from "./pages/writersProfile";
 import About from "./pages/about";
-import ProtectedRoute, {
-  UnProtectedRoute,
-} from "./components/authentication/ProtectedRoute";
+import ProtectedRoute from "./components/authentication/ProtectedRoute";
 import Help from "./pages/help";
 import Privacy from "./pages/privacy";
 import EditorPage from "./pages/editor";
@@ -16,12 +14,7 @@ import Profile from "./pages/profile";
 import ComingSoon from "./pages/comingSoon/ComingSoon";
 import PremiumContent from "./pages/premium/premiumContent";
 import BlogsCategoryPage from "./components/blogsCategoryPage/BlogsCategoryPage";
-import Wallet from "./pages/wallet/Wallet";
 import Category from "./pages/Categories";
-import StakingUi from "./components/StakingUi";
-// import AdminUi from "./components/AdminUi";
-import LiquidityPool from "./components/LiquidityPool";
-import Settings from "./pages/settings";
 import CategoryHead from "./pages/Categories/categoriesComponents/CategoryHead";
 import OtpAuth from "./components/authentication/OtpAuth";
 import Culture from "./pages/Categories/categoriesComponents/Culture";
@@ -45,18 +38,11 @@ function App() {
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
 
-          {/* <Route path="/admin" element={<AdminUi />}></Route>
-          <Route path="/settings" element={<Settings />}></Route>
-          <Route path="/staking" element={<StakingUi />}></Route>
-          <Route path="/lp" element={<LiquidityPool />}></Route> */}
-          
-          {/* wallet */}
-          <Route path="/wallet" element={<Wallet />} />
 
           {/* thank you */}
           {/* <Route path="/thank-you/:ref" element={<ThankYou />} /> */}
         </Route>
-        {/* <Route element={<UnProtectedRoute />}> */}
+        
           <Route path="/:id/blogs" element={<WritersProfile />}></Route>
           {/* THE PUBLIC PROFILE OF A CREATOR */}
           <Route path="/:id" element={<CreatorsProfile />}></Route>
@@ -85,12 +71,6 @@ function App() {
           <Route path="/category/technology" element={<Technology />}></Route>
 
 
-          {/* Temporary, they're supposed to be protected routes */}
-          {/* <Route path="/admin" element={<AdminUi />}></Route> */}
-          <Route path="/staking" element={<StakingUi />}></Route>
-          <Route path="/lp" element={<LiquidityPool />}></Route>
-          <Route path="/settings" element={<Settings />}></Route>
-        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );

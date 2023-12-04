@@ -73,6 +73,8 @@ function TopNews({ posts }) {
         <News posts={posts} />
         <div className="ads__box--big">&nbsp;</div>
         <News posts={posts} />
+        <div className="ads__box--big">&nbsp;</div>
+        <News posts={posts} />
       </div>
       <span style={{ display: "flex", justifyContent: "center" }}>
         <a href="#">

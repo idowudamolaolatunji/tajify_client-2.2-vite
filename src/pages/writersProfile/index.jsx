@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import Tabs from "../../components/Tabs";
 import AdsSecond from "../../components/Ads2";
 import Profile from "../../components/Profile";
-import SubHeader from "../../components/SubHeader";
+import MainHeaderW from "../../components/MainHeaderW";
 import "../../pages/blogHome/main.css";
 import { Link } from "react-router-dom";
 // import CategoryHead from "../Categories/categoriesComponents/CategoryHead";
@@ -18,7 +18,7 @@ const WritersProfile = () => {
   return (
     <WritersProfileContainer>
       <div className="blog__container">
-        <Navbar />
+        <MainHeaderW />
         <div className="section__container">
           <div className=" custom__width h-full mt-[33px] mb-[33px] ">
             <div className="add__post--1 ">

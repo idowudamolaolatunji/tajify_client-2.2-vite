@@ -16,7 +16,7 @@ const CreatorsProfile = () => {
       <MainHeaderW />
       <ProfileHeroCreator />
       <BioInfoCreator />
-      {/* <FollowAndPersonals /> */}
+      <FollowAndPersonals />
     </div>
   );
 };
