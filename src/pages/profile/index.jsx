@@ -6,6 +6,8 @@ import './profile.css';
 import FollowAndPersonals from './profileComponents/FollowAndPersonals';
 import SubHeader from '../../components/SubHeader';
 import Navbar from "../../components/Navbar";
+import MainHeaderW from "../../components/MainHeaderW";
+
 
 
 function UserProfile() {
@@ -18,7 +20,8 @@ function UserProfile() {
   return (
     <>
       {/* <ProfileHeader /> */}
-      <Navbar />
+      {/* <Navbar /> */}
+      <MainHeaderW />
       <ProfileHero />
       <BioInfo />
       <FollowAndPersonals />

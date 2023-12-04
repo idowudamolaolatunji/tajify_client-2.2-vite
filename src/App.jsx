@@ -19,7 +19,7 @@ import BlogsCategoryPage from "./components/blogsCategoryPage/BlogsCategoryPage"
 import Wallet from "./pages/wallet/Wallet";
 import Category from "./pages/Categories";
 import StakingUi from "./components/StakingUi";
-import AdminUi from "./components/AdminUi";
+// import AdminUi from "./components/AdminUi";
 import LiquidityPool from "./components/LiquidityPool";
 import Settings from "./pages/settings";
 import CategoryHead from "./pages/Categories/categoriesComponents/CategoryHead";
@@ -86,7 +86,7 @@ function App() {
 
 
           {/* Temporary, they're supposed to be protected routes */}
-          <Route path="/admin" element={<AdminUi />}></Route>
+          {/* <Route path="/admin" element={<AdminUi />}></Route> */}
           <Route path="/staking" element={<StakingUi />}></Route>
           <Route path="/lp" element={<LiquidityPool />}></Route>
           <Route path="/settings" element={<Settings />}></Route>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MainHeader from "../../components/MainHeader";
 import SubHeader from "../../components/SubHeader";
+import MainHeaderW from '../../components/MainHeaderW';
 import Hero from "../../components/Hero";
 import MostPopularCourses from "../../components/MostPopularCourses";
 import TreadingArticles from "../../components/TreadingArticles";
@@ -20,7 +21,7 @@ const BlogHome = () => {
   return (
     <>
    
-        <MainHeader />
+        <MainHeaderW />
         <Hero />
         <MostPopularCourses />
         <TreadingArticles />

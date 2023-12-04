@@ -36,6 +36,8 @@ import { HOST_URL } from "../../assets/js/help_func";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import Premium from "../../components/Premium";
+import MainHeaderW from "../../components/MainHeaderW";
+
 
 const BlogDetails = () => {
   const { user, token } = useAuthContext();
@@ -309,9 +311,11 @@ const BlogDetails = () => {
   {
     return (
       <div className="blog__container">
-        <div className="header__style">
+        {/* <div className="header__style">
           <Navbar />
-        </div>
+        </div> */}
+        <MainHeaderW />
+
 
         {loading ? (
           <div className="loader__container">

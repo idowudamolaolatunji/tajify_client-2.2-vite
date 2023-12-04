@@ -392,6 +392,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { Textarea, FormControl, FormLabel } from "@chakra-ui/react";
 // import Loader from "../../components/Loader";
+import MainHeaderW from "../../components/MainHeaderW";
 import LoaderSpinner from "../../components/LoaderSpinner";
 import { HOST_URL } from "../../assets/js/help_func";
 
@@ -496,7 +497,7 @@ const EditorPage = () => {
   return (
     <div className="blog__container">
       {/* <SubHeader /> */}
-      <Navbar />
+      <MainHeaderW />
 
       <div className="custom__width editor__width">
         <div className="display__col">

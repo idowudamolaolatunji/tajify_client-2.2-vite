@@ -47,33 +47,65 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrMsg(""); // Reset error message
 
     try {
-      const response = await axios.post(
-        `${HOST_URL()}/users/login`,
-        JSON.stringify({ email, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      e.preventDefault();
+      setLoading(true);
+      setErrMsg(""); // Reset error message
 
-      if (response.data.data.token) {
-        toast.success("Login Success!");
-        handleChange(response.data.data.user, response.data.data.token);
-        setLoading(true);
-      } else {
-        setLoading(false);
-        toast.error("Invalid username or Password");
-        setErrors(response?.data?.data?.errors);
+      // const res = await fetch(`${HOST_URL}/users/login`, {
+      const res = await fetch(`http://localhost:3005/api/users/login`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      if(!res.ok) {
+        throw new Error("Something went wrong!")
       }
-    } catch (err) {
-      setLoading(false);
-      console.error(err);
-      setErrMsg("Login Failed"); // Update error message for unsuccessful login
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+
+      toast.success("Login Success!");
+      handleChange(data.data.user, data.data.token);
+
+    } catch(err) {
+      setErrMsg(err.message);
+      toast.error(err.message);
+      setErrors(err.message);
+    } finally {
+      setLoading(false)
     }
+
+
+
+
+    // try {
+    //   const response = await axios.post(
+    //     `${HOST_URL()}/users/login`,
+    //     JSON.stringify({ email, password }),
+    //     {
+    //       headers: { "Content-Type": "application/json" },
+    //     }
+    //   );
+
+    //   if (response.data.data.token) {
+    //     toast.success("Login Success!");
+    //     handleChange(response.data.data.user, response.data.data.token);
+    //     setLoading(true);
+    //   } else {
+    //     setLoading(false);
+    //     toast.error("Invalid username or Password");
+    //     setErrors(response?.data?.data?.errors);
+    //   }
+    // } catch (err) {
+    //   setLoading(false);
+    //   console.error(err);
+    //   setErrMsg("Login Failed"); // Update error message for unsuccessful login
+    // }
   };
 
   useEffect(() => {

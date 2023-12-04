@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import BioInfoCreator from "./creatorComponents/BioInfoCreator";
 import ProfileHeroCreator from "./creatorComponents/ProfileHeroCreator";
 import Navbar from "../../components/Navbar";
+import MainHeaderW from "../../components/MainHeaderW";
+
 
 const CreatorsProfile = () => {
   useEffect(() => {
@@ -11,7 +13,7 @@ const CreatorsProfile = () => {
 
   return (
     <div>
-      <Navbar />
+      <MainHeaderW />
       <ProfileHeroCreator />
       <BioInfoCreator />
       {/* <FollowAndPersonals /> */}

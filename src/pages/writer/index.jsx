@@ -19,6 +19,8 @@ import axios from "axios";
 import LoaderSpinner from "../../components/LoaderSpinner";
 import { HOST_URL } from "../../assets/js/help_func";
 import CategoryHead from "../Categories/categoriesComponents/CategoryHead";
+import MainHeaderW from "../../components/MainHeaderW";
+
 
 // const All_BLOGS_URL = "https://api.tajify.com/api/blogs"; // Updated API URL
 const All_BLOGS_URL = `${HOST_URL()}/blogs`; // Updated API URL
@@ -68,9 +70,10 @@ const Writer = () => {
     <WriterContainer>
       {/* <div className="index__page"> */}
       <div>
-        <div className="header__style">
+        {/* <div className="header__style">
           <Navbar />
-        </div>
+        </div> */}
+        <MainHeaderW  />
 
         {loading ? (
           <div className="loader__container">
