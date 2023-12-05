@@ -29,6 +29,7 @@ import Technology from "./pages/Categories/categoriesComponents/Technology";
 import CreatorsProfile from "./pages/creatorsProfile/Index";
 // import ThankYou from "./pages/thankyou/ThankYou";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -37,7 +38,6 @@ function App() {
           <Route path="/editor" element={<EditorPage />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
-
 
           {/* thank you */}
           {/* <Route path="/thank-you/:ref" element={<ThankYou />} /> */}

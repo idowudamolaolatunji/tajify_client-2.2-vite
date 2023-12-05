@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import BioInfoCreator from "./creatorComponents/BioInfoCreator";
 import ProfileHeroCreator from "./creatorComponents/ProfileHeroCreator";
+import FollowAndPersonals from '../profile/profileComponents/FollowAndPersonals'
 import Navbar from "../../components/Navbar";
 import MainHeaderW from "../../components/MainHeaderW";
 

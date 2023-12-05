@@ -38,14 +38,6 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const validate = () => {
-    if (email != "" && password != "") {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   const handleSubmit = async (e) => {
 
     try {
@@ -79,33 +71,6 @@ const Login = () => {
     } finally {
       setLoading(false)
     }
-
-
-
-
-    // try {
-    //   const response = await axios.post(
-    //     `${HOST_URL()}/users/login`,
-    //     JSON.stringify({ email, password }),
-    //     {
-    //       headers: { "Content-Type": "application/json" },
-    //     }
-    //   );
-
-    //   if (response.data.data.token) {
-    //     toast.success("Login Success!");
-    //     handleChange(response.data.data.user, response.data.data.token);
-    //     setLoading(true);
-    //   } else {
-    //     setLoading(false);
-    //     toast.error("Invalid username or Password");
-    //     setErrors(response?.data?.data?.errors);
-    //   }
-    // } catch (err) {
-    //   setLoading(false);
-    //   console.error(err);
-    //   setErrMsg("Login Failed"); // Update error message for unsuccessful login
-    // }
   };
 
   useEffect(() => {

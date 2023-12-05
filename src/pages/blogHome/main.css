@@ -295,7 +295,6 @@ header.header-green .navbar__list {
   display: flex;
   width: 100%;
   justify-content: center;
-  /* height: 100%; */
   height: 24rem;
   border-radius: 1.4rem;
   overflow: hidden;
@@ -717,7 +716,7 @@ header.header-green .navbar__list {
 }
 .top-creators__cards {
   display: grid;
-  gap: 2.8rem;
+  gap: 3.2rem;
 }
 .creator {
   cursor: pointer;
