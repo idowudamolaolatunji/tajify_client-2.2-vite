@@ -27,6 +27,7 @@ import Lifestyle from "./pages/Categories/categoriesComponents/Lifestyle";
 import Sport from "./pages/Categories/categoriesComponents/Sport";
 import Technology from "./pages/Categories/categoriesComponents/Technology";
 import CreatorsProfile from "./pages/creatorsProfile/Index";
+import Settings from "./pages/settings/index";
 // import ThankYou from "./pages/thankyou/ThankYou";
 
 
@@ -38,6 +39,7 @@ function App() {
           <Route path="/editor" element={<EditorPage />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
+          <Route path="/settings" element={<Settings />}></Route>
 
           {/* thank you */}
           {/* <Route path="/thank-you/:ref" element={<ThankYou />} /> */}
