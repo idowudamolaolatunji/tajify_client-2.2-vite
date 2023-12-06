@@ -14,16 +14,15 @@ const All_BLOGS_URL = `${HOST_URL()}/blogs`; // Updated API URL
 function TopNewsAndFeaturedArticles() {
 
   const { token } = useAuthContext();
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
 
    
 
   useEffect(() => {
-    setLoading(true);
-
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get(All_BLOGS_URL, {
           headers: {
             "Content-Type": "application/json",
@@ -40,16 +39,15 @@ function TopNewsAndFeaturedArticles() {
           //   content: truncateText(post.content, 20),
           // }));
 
-          // const truncatedPosts = truncatedPostsFunc(response.data.data.blogs)
           setPosts(response.data.data.blogs);
         } else {
           console.error("Error fetching posts");
         }
 
-        setLoading(false);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error:", error);
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -64,7 +62,7 @@ function TopNewsAndFeaturedArticles() {
     return (
         <section className="section">
             <div className="section__container topnews-and-article">
-                <TopNews posts={posts} />
+                <TopNews posts={posts} isLoading={isLoading} />
                 <MostSearchedAndFeaturedArticles />
             </div>
         </section>

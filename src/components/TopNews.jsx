@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import News from "./News";
 import news1 from "../assets/images/pngs/article1.png";
 import news2 from "../assets/images/pngs/article2.png";
@@ -7,6 +7,8 @@ import news4 from "../assets/images/pngs/article4.png";
 import news5 from "../assets/images/pngs/article5.png";
 import news6 from "../assets/images/pngs/article6.png";
 import news7 from "../assets/images/pngs/article7.png";
+
+import LoaderSpinner from "../components/LoaderSpinner.jsx";
 
 // const NewsData = [
 //     {
@@ -64,59 +66,67 @@ import news7 from "../assets/images/pngs/article7.png";
 // ];
 
 import { MdKeyboardDoubleArrowDown } from "react-icons/md";
+// import { Spinner } from "@chakra-ui/react";
 
-function TopNews({ posts }) {
+function TopNews({ posts, isLoading }) {
+	// const [isLoading, setIsLoading] = useState(false);
 
-  //  Truncate text to either 1000 words or 10 lines
-  const truncateText = (text, maxLength) => {
-    const words = text.split(" ");
-    let truncatedText = words.slice(0, maxLength).join(" ");
+	function Spinner() {
+		return (
+			<div style={{ margin: "20px auto" }}>
+				<LoaderSpinner />
+			</div>
+		);
+	}
 
-    if (words.length > maxLength) {
-      truncatedText += " ...";
-    }
+	//  Truncate text to either 1000 words or 10 lines
+	const truncateText = (text, maxLength) => {
+		const words = text.split(" ");
+		let truncatedText = words.slice(0, maxLength).join(" ");
 
-    return truncatedText;
-  };
+		if (words.length > maxLength) {
+			truncatedText += " ...";
+		}
 
-  // BLOG RANDOM SHUFFLE FUNCTION
+		return truncatedText;
+	};
+
+	// BLOG RANDOM SHUFFLE FUNCTION
 	function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-    }
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	}
 
-  function truncatedPostsFunc (data) {
-    const shuffledBlogs = shuffleArray(data);
-      return shuffledBlogs.slice(0, 3).map((data) => ({
-        ...data,
-        content: truncateText(data.content, 25),
-      }));
-  }
+	function truncatedPostsFunc(data) {
+		const shuffledBlogs = shuffleArray(data);
+		return shuffledBlogs.slice(0, 3).map((data) => ({
+			...data,
+			content: truncateText(data.content, 25),
+		}));
+	}
 
-  // const blogs = truncatedPostsFunc(posts);
+	return (
+		<div className="topnews">
+			<h3 className="heading__tetariary">Top news</h3>
+			<div className="news__cards">
+				{isLoading ? <Spinner /> : <News posts={truncatedPostsFunc(posts)} />}
 
-  return (
-    <div className="topnews">
-      <h3 className="heading__tetariary">Top news</h3>
-      <div className="news__cards">
-        <News posts={truncatedPostsFunc(posts)} />
-        <div className="ads__box--big">&nbsp;</div>
-        <News posts={truncatedPostsFunc(posts)} />
-        <div className="ads__box--big">&nbsp;</div>
-        <News posts={truncatedPostsFunc(posts)} />
-      </div>
-      <span style={{ display: "flex", justifyContent: "center" }}>
-        <span className="more-botton" onClick={''}>
-          <MdKeyboardDoubleArrowDown
-            style={{ color: "#FF0066", fontSize: "2.4rem" }}
-          />
-        </span>
-      </span>
-    </div>
-  );
+				<div className="ads__box--big">&nbsp;</div>
+
+				{isLoading ? <Spinner /> : <News posts={truncatedPostsFunc(posts)} />}
+
+				<div className="ads__box--big">&nbsp;</div>
+
+				{isLoading ? <Spinner /> : <News posts={truncatedPostsFunc(posts)} />}
+			</div>
+			{/* <span style={{ display: "flex", justifyContent: "center" }}>
+        <MdKeyboardDoubleArrowDown style={{ color: "#FF0066", fontSize: "2.4rem" }} />
+			</span> */}
+		</div>
+	);
 }
 
 // function TopNews({posts}) {
