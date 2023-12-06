@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import MainHeader from "../../components/MainHeader";
+import MainHeaderW from "../../components/MainHeaderW";
 import Footer from "../../components/Footer";
 import CategoryHead from "./categoriesComponents/CategoryHead";
 import CategoryBlogs from "./categoriesComponents/CategoryBlogs";

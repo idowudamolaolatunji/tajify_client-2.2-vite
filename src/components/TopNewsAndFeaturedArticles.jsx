@@ -17,34 +17,7 @@ function TopNewsAndFeaturedArticles() {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
 
-   //  Truncate text to either 1000 words or 10 lines
-   const truncateText = (text, maxLength) => {
-    const words = text.split(" ");
-    let truncatedText = words.slice(0, maxLength).join(" ");
-
-    if (words.length > maxLength) {
-      truncatedText += " ...";
-    }
-
-    return truncatedText;
-  };
-
-  // BLOG RANDOM SHUFFLE FUNCTION
-	function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-    }
-
-  function truncatedPostsFunc (data) {
-    const shuffledBlogs = shuffleArray(data);
-      return shuffledBlogs.slice(0, 3).map((post) => ({
-        ...post,
-        content: truncateText(post.content, 25),
-      }));
-  }
+   
 
   useEffect(() => {
     setLoading(true);
@@ -67,8 +40,8 @@ function TopNewsAndFeaturedArticles() {
           //   content: truncateText(post.content, 20),
           // }));
 
-          const truncatedPosts = truncatedPostsFunc(response.data.data.blogs)
-          setPosts(truncatedPosts);
+          // const truncatedPosts = truncatedPostsFunc(response.data.data.blogs)
+          setPosts(response.data.data.blogs);
         } else {
           console.error("Error fetching posts");
         }
