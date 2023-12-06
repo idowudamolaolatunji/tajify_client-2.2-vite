@@ -129,24 +129,4 @@ function TopNews({ posts, isLoading }) {
 	);
 }
 
-// function TopNews({posts}) {
-//     return (
-//         <div className="topnews">
-//             <h3 className="heading__tetariary">Top news</h3>
-//             <div className="news__cards">
-//                 {NewsData.map(data => {
-//                     return <News key={data.title} title={data.title} text={data.text} date={data.date} comments={data.comments} image={data.imagePath} />
-//                 })}
-//                 <div className="ads__box--big">&nbsp;</div>
-//                 {NewsData2.map(data => {
-//                     return <News key={data.title} title={data.title} text={data.text} date={data.date} comments={data.comments} image={data.imagePath} />
-//                 })}
-//             </div>
-//             <span style={{display: 'flex', justifyContent: 'center'}}>
-//                 <a href='#'><MdKeyboardDoubleArrowDown style={{color: '#FF0066', fontSize: '2.4rem'}}/></a>
-//             </span>
-//         </div>
-//     )
-// }
-
 export default TopNews;
