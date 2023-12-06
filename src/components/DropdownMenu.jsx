@@ -25,14 +25,7 @@ function DropdownMenu({}) {
           <BsBarChart />
           <p>Stats</p>
         </li>
-        <Link to="/wallet">
-          <li className="dropdown-item">
-            <RxDashboard />
-
-            <p>Wallet</p>
-          </li>
-        </Link>
-        <Link to="/wallet">
+        <Link to="">
           <li className="dropdown-item">
             <CiWallet />
 
