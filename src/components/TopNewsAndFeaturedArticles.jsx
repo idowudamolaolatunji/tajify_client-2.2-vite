@@ -29,6 +29,23 @@ function TopNewsAndFeaturedArticles() {
     return truncatedText;
   };
 
+  // BLOG RANDOM SHUFFLE FUNCTION
+	function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+    }
+
+  function truncatedPostsFunc (data) {
+    const shuffledBlogs = shuffleArray(data);
+      return shuffledBlogs.slice(0, 3).map((post) => ({
+        ...post,
+        content: truncateText(post.content, 25),
+      }));
+  }
+
   useEffect(() => {
     setLoading(true);
 
@@ -36,19 +53,22 @@ function TopNewsAndFeaturedArticles() {
       try {
         const response = await axios.get(All_BLOGS_URL, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${token}`,
           },
         });
 
         if (response.data.data.blogs) {
         
-          const truncatedPosts = response.data.data.blogs
-          .slice(0, 3)
-          .map((post) => ({
-            ...post,
-            content: truncateText(post.content, 20),
-          }));
-        setPosts(truncatedPosts);
+          // const truncatedPosts = response.data.data.blogs
+          // .slice(0, 3)
+          // .map((post) => ({
+          //   ...post,
+          //   content: truncateText(post.content, 20),
+          // }));
+
+          const truncatedPosts = truncatedPostsFunc(response.data.data.blogs)
+          setPosts(truncatedPosts);
         } else {
           console.error("Error fetching posts");
         }

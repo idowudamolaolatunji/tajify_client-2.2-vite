@@ -133,7 +133,6 @@ function MostPopularCourses() {
         
           {coursesData.map((data) => (
             <div className="w-[800px]">
-
             <div
               className="course__cards "
               style={{

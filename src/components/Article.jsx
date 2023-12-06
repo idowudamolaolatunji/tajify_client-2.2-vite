@@ -31,36 +31,15 @@ function Article({ image, AvatarImg, articleViews, articleLikes, articleComments
 		return truncatedText;
 	};
 
-	// useEffect(() => {
 
-	//   const fetchData = async () => {
-	//     try {
-	//       const response = await axios.get(All_BLOGS_URL, {
-	//         headers: {
-	//           Authorization: `Bearer ${token}`,
-	//         },
-	//       });
-
-	//       if (response.data.data.blogs) {
-	//         const truncatedPosts = response.data.data.blogs
-	//           .slice(0, 3)
-	//           .map((post) => ({
-	//             ...post,
-	//             content: truncateText(post.content, 60),
-	//           }));
-	//         setPosts(truncatedPosts);
-	//         // setPosts(response.data.data.blogs.slice(0,3));
-	//       } else {
-	//         console.error("Error fetching posts");
-	//       }
-
-	//     } catch (error) {
-	//       console.error("Error:", error);
-	//     }
-	//   };
-
-	//   fetchData();
-	// }, [token]);
+	// BLOG RANDOM SHUFFLE FUNCTION
+	function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+	return array;
+	}
 
 	const fetchTrendingBlogs = async () => {
 		try {
@@ -68,9 +47,10 @@ function Article({ image, AvatarImg, articleViews, articleLikes, articleComments
 
 			console.log(response);
 			if (response.data.data.blogs) {
-				const truncatedPosts = response.data.data.blogs.slice(0, 3).map((post) => ({
+				const shuffledBlogs = shuffleArray(response.data.data.blogs);
+				const truncatedPosts = shuffledBlogs.slice(0, 3).map((post) => ({
 					...post,
-					content: truncateText(post.content, 60),
+				content: truncateText(post.content, 60),
 				}));
 				// setBlogsCategory(response.data.data.blogs);
 				setTrendingBlogs(truncatedPosts);

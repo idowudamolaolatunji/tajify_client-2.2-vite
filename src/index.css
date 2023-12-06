@@ -321,6 +321,14 @@ input {
   margin: 20px 0;
 }
 
+.mySwiper  {
+  height: 34rem !important;
+}
+.mySwiper .card__figure {
+  height: 30rem !important;
+}
+
+
 /* Media query for mobile screens (adjust the breakpoint as needed) */
 @media (max-width: 768px) {
   .element {
