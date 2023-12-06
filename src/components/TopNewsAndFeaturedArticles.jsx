@@ -62,7 +62,7 @@ function TopNewsAndFeaturedArticles() {
     return (
         <section className="section">
             <div className="section__container topnews-and-article">
-                <TopNews posts={posts} isLoading={isLoading} />
+                <TopNews posts={posts} isLoading={isLoading} setIsLoading={setIsLoading} />
                 <MostSearchedAndFeaturedArticles />
             </div>
         </section>
