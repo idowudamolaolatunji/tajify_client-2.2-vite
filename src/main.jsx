@@ -21,7 +21,7 @@ const theme = extendTheme({ colors });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <AuthProvider>
       <DataProvider>
         <ToastContainer
@@ -41,5 +41,5 @@ root.render(
         <App />
       </ChakraProvider>
     </AuthProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

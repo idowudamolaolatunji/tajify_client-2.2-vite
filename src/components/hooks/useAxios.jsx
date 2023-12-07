@@ -3,7 +3,7 @@ import jwtDecode from "jwt-decode";
 import { State } from "../../context/AuthProvider";
 import { useNavigate } from "react-router";
 
-const apiUrl = process.env.REACT_APP_API_URL;
+const apiUrl = import.meta.env.REACT_APP_API_URL;
 
 const useAxios = () => {
   const { setToken, token, setUser, logOut } = State();
