@@ -36,7 +36,7 @@ import { HOST_URL } from "../../assets/js/help_func";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import Premium from "../../components/Premium";
-import MainHeaderW from "../../components/MainHeaderW";
+import BlogNavbar from "../../components/Navbar";
 
 
 const BlogDetails = () => {
@@ -314,7 +314,7 @@ const BlogDetails = () => {
         {/* <div className="header__style">
           <Navbar />
         </div> */}
-        <MainHeaderW />
+        <BlogNavbar />
 
 
         {loading ? (

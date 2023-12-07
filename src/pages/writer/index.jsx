@@ -11,7 +11,7 @@ import "../../index.css";
 import "../../pages/blogHome/main.css";
 import MainHeader from "../../components/MainHeader";
 import TopCreators from "../../components/TopCreators";
-import Navbar from "../../components/Navbar";
+import BlogNavbar from "../../components/Navbar";
 import { Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useAuthContext } from "../../context/AuthContext";
@@ -73,7 +73,7 @@ const Writer = () => {
         {/* <div className="header__style">
           <Navbar />
         </div> */}
-        <MainHeaderW  />
+        <BlogNavbar  />
 
         {loading ? (
           <div className="loader__container">

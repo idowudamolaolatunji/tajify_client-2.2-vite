@@ -229,9 +229,7 @@ const Profile = () => {
                 </button>
               </div>
             </div>
-            <p>
-              {creator.bio}
-            </p>
+            <p>{creator.bio}</p>
           </div>
         </div>
 
@@ -314,8 +312,9 @@ const Profile = () => {
                   className="align-middle w-full object-cover transition duration-300 ease-linear mb-5"
                 />
               </div>
-
-              <h1 className="bold__text__pink">{post.title}</h1>
+              <Link to={`/details/${post._id}`}>
+                <h1 className="bold__text__pink">{post.title}</h1>
+              </Link>
               <div className="r-profile-info">
                 <div className="flex items-center justify-between w-full">
                   <img

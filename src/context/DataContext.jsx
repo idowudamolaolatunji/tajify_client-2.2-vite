@@ -8,7 +8,7 @@ export default DataContext;
 
 export const DataProvider = ({ children }) => {
   //states i want to keep
-  const { token, shouldKick } = useAuthContext();
+  const { token,  shouldKick } = useAuthContext();
 
   //for pop up modals and other general continuos functions
   const [move, setMove] = useState(false);
@@ -37,6 +37,9 @@ export const DataProvider = ({ children }) => {
       // });
     }
   };
+
+
+
 
   useEffect(() => {
     getCurrencyRate();
