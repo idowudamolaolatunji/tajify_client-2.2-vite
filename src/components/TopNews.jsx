@@ -8,7 +8,7 @@ import { MdKeyboardDoubleArrowDown } from "react-icons/md";
 // THIS IS THE SPINNER
 function Spinner() {
   return (
-    <div style={{ margin: "20px auto" }}>
+    <div style={{ margin: "20px 0 20px -20px" }}>
       <LoaderSpinner />
     </div>
   );
