@@ -8,7 +8,6 @@ import { BiNetworkChart } from "react-icons/bi";
 import { GiShoppingBag } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BsFillGridFill, BsFillBellFill, BsChevronDown } from "react-icons/bs";
-// import LogoImg from '../assets/imgs/pngs/TAJIFY-LOGO.png';
 import LogoImg from "../assets/images/pngs/logo-complete.png";
 // from "../assets/imgs/pngs/avatar.png";
 import { useAuthContext } from "../context/AuthContext";

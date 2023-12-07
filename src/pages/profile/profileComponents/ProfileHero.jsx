@@ -11,14 +11,43 @@ import { toast } from "react-toastify";
 import { HOST_URL } from "../../../assets/js/help_func";
 
 function ProfileHero() {
-  const IMAGE_UPLOAD_URL = `${HOST_URL()}/users/update-my-profile-picture`; 
+  const GET_USER_OBJ_URL = `${HOST_URL()}/users/getMyObj`;
+  const IMAGE_UPLOAD_URL = `${HOST_URL()}/users/update-my-profile-picture`;
   // Replace with your actual API endpoint
 
-  const { token, user, refetchHelp, handleUser } = useAuthContext();
+  const { user, token, refetchHelp, handleUser } = useAuthContext();
   const [profileImage, setProfileImage] = useState();
   const [image, setImage] = useState();
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
- 
+
+  const [userImage, setUserImage] = useState();
+  const [bioInfo, setBioInfo] = useState();
+
+  // This function generates all the updated information of the user
+  const getCurrentUserUpdatedObj = async (id) => {
+    try {
+      const userObj = await axios.get(GET_USER_OBJ_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (userObj.data.data.user) {
+        console.log(userObj.data.data.user.image);
+        setUserImage(userObj.data.data.user.image);
+        setBioInfo(userObj.data.data.user);
+      } else {
+        console.error("Error fetching user object");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // Render first upon every page reload
+  useEffect(() => {
+    getCurrentUserUpdatedObj();
+  }, []);
 
   const handleUpdateProfile = (updatedProfile) => {
     // Update the user's profile data in your state or make an API request
@@ -29,6 +58,7 @@ function ProfileHero() {
   // UPLOAD IMAGE TO CLOUDINARY AND POST TO ENDPOINT
   const handleImage = async (e) => {
     const file = e.target.files[0];
+    // setLoading(true);
 
     try {
       // Upload image to Cloudinary
@@ -36,7 +66,7 @@ function ProfileHero() {
       formData.append("file", file);
       formData.append(
         "upload_preset",
-        import.meta.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+        import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET
       );
 
       const cloudinaryResponse = await axios.post(
@@ -61,8 +91,8 @@ function ProfileHero() {
 
         if (serverResponse.status === 200) {
           // Server successfully received the image URL
-          handleUser(serverResponse.data.data)
-          setImage(serverResponse.data.data.profileImage)
+          // handleUser(serverResponse.data.user);
+          setImage(serverResponse.data.data.profileImage);
           console.log("Image uploaded and server notified");
           toast.success("successfully updated profile picture");
         } else {
@@ -84,23 +114,31 @@ function ProfileHero() {
 
   useEffect(() => {}, [refetchHelp]);
   console.log(user);
-  console.log(handleUser)
+  console.log(handleUser);
 
   return (
     <section className="profile-hero__section">
       <div className="section__container profile-hero">
         <div className="profile-hero__details">
           <div className="profile-hero__image--box">
-            {user ? (
+            {/* {user ? (
               <img className="profile-hero__image" src={user.image} alt />
+            ) : (
+              <img
+                className="profile-hero__image"
+                src={userImage}
+                alt="profile image"
+              />
+            )} */}
+            {userImage ? (
+              <img
+                className="profile-hero__image"
+                src={userImage}
+                alt="profile image"
+              />
             ) : (
               <Avatar size={"lg"} />
             )}
-            {/* {image ? (
-              <img className="profile-hero__image" src={image} alt />
-            ) : (
-              <Avatar size={"lg"} />
-            )} */}
 
             <span>
               <label htmlFor="image-upload" className="image__icon">
@@ -118,16 +156,12 @@ function ProfileHero() {
           </div>
 
           <div className="profile-hero__content">
-            <h4 className="profile-hero__fullname">{user.fullname}</h4>
-            <p className="profile-hero__username">{user.username}</p>
-            <p className="profile-hero__tags">{user.occupation}</p>
+            <h4 className="profile-hero__fullname">{bioInfo?.fullname}</h4>
+            <p className="profile-hero__username">{bioInfo?.username}</p>
+            <p className="profile-hero__tags">{bioInfo?.occupation}</p>
           </div>
           <div className="edit__profile flex justify-between ">
-            <button
-              // className="profile-hero__button"
-              className="profile-hero__button"
-              // onClick={uploadProfileImage}
-            >
+            <button className="profile-hero__button">
               <AiOutlinePlus />
               Add Cover Image
             </button>

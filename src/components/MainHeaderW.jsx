@@ -15,15 +15,45 @@ import { useAuthContext } from "../context/AuthContext";
 
 import "../assets/css/header.css";
 import DropdownMenu from "./DropdownMenu";
+import { HOST_URL } from "../assets/js/help_func";
+import axios from "axios";
+
+const GET_USER_OBJ_URL = `${HOST_URL()}/users/getMyObj`;
 
 function MainGreenHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
   const profileBoxRef = useRef(null);
-  const { user } = useAuthContext();
+  const { user, token } = useAuthContext();
+  const [userImage, setUserImage] = useState();
+
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+
+  // This function generates all the updated information of the user
+  const getCurrentUserUpdatedObj = async (id) => {
+    try {
+      const userObj = await axios.get(GET_USER_OBJ_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (userObj.data.data.user?.image) {
+        console.log(userObj.data.data.user?.image);
+        setUserImage(userObj.data.data.user?.image);
+      } else {
+        console.error("Error fetching user object");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  console.log(userImage);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -38,6 +68,12 @@ function MainGreenHeader() {
     return () => {
       document.body.removeEventListener("click", handleOutsideClick);
     };
+  }, []);
+
+
+  // Render first upon every page reload
+  useEffect(() => {
+    getCurrentUserUpdatedObj(); 
   }, []);
 
   return (
@@ -116,9 +152,10 @@ function MainGreenHeader() {
               <span className="navbar--profile">
                 <img
                   className="navbar--profile-img"
-                  src={user?.image}
-                  alt={user?.image}
+                  src={userImage}
+                  alt={userImage}
                 />
+            
                 <Link to="/profile">
                   <p className="author">{user?.fullName || user?.username}</p>
                 </Link>

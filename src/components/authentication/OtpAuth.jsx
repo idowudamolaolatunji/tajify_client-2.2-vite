@@ -6,6 +6,7 @@ import otpVerificationImg from "../../assets/images/pngs/otp-verification.png";
 import axios from "axios";
 import LoaderSpinner from "../LoaderSpinner";
 import OtpInput from "react-otp-input";
+import { HOST_URL } from "../../assets/js/help_func";
 
 const customStyles = {
   background: "none", // Transparent black background
@@ -30,8 +31,7 @@ const OtpAuth = ({ isOpen, onClose, email }) => {
   const handleVerifyOtp = async () => {
     try {
       const response = await axios.post(
-        "https://api.tajify.com/api/users/verifyOtp",
-        // "http://localhost:3005/api/users/verifyOtp",
+        `${HOST_URL()}/users/verifyOtp`,
         { email, otp }
       );
       console.log(response);
