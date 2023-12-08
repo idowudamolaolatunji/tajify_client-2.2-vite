@@ -8,7 +8,7 @@ import "./auth.css";
 import { HiOutlineKey } from "react-icons/hi";
 import { BiSolidUser } from "react-icons/bi";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
-import { AiOutlineMail } from "react-icons/ai";
+import { AiFillCheckCircle, AiFillExclamationCircle, AiOutlineMail } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import SignupImg from "../../assets/images/pngs/signup-img.png";
 import { Link } from "react-router-dom";
@@ -18,6 +18,8 @@ import { HOST_URL } from "../../assets/js/help_func";
 // import Loader from "../Loader";
 
 import OtpAuth from './OtpAuth';
+import Alert from "../Alert";
+import MainSpinner from "../MainSpinner";
 
 // const REGISTER_URL = "https://api.tajify.com/api/users/signup";
 // const REGISTER_URL = "http://localhost:3005/api/users/signup";
@@ -31,63 +33,96 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [check, setCheck] = useState(true)
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
 
+  const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+
+  function handleError(mess) {
+		setIsError(true);
+		setMessage(mess);
+		setTimeout(() => {
+			setIsError(false);
+			setMessage("");
+		}, 2000);
+	}
+
+	function handleReset() {
+    setCheck(true)
+		setIsError(false);
+		setIsSuccess(false);
+		setMessage("");
+	}
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrMsg(""); // Reset error message
-
     try {
-      const response = await axios.post(
-        // REGISTER_URL,
-        HOST_URL() + "/users/signup",
-        JSON.stringify({ username, email, password, passwordConfirm }),
-        {
+      e.preventDefault();
+      setLoading(true);
+      handleReset();
+
+      if(email === '' || password === '' || username === "" || passwordConfirm === "" || !check) throw new Error('All fields are required!');
+      
+      const res = await fetch( HOST_URL() + "/users/signup", {
+          method: 'POST',
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password, passwordConfirm }),
         }
       );
 
-      // console.log(JSON.stringify(response.data));
-      // setLoading(true);
-      // handleChange(response.user, response.token);
-      // setIsModalOpen(true);
-      setShowOtpModal(true);
+      if(!res.ok) {
+        throw new Error("Something went wrong!")
+      }
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+
+      setIsSuccess(true);
+      setMessage(data.message || 'Signup Successful. Verify OTP Code')
+			setTimeout(() => {
+        setIsSuccess(false);
+				setMessage("");
+        setShowOtpModal(true);
+			}, 1000);
       // navigate("/verify-otp");
 
-      // Handle success and redirection
     } catch (err) {
-      console.error(err);
-      setLoading(false);
-      setErrMsg("Registration Failed");
+      handleError(err.message)
+    } finally {
+      setLoading(false)
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     navigate("/");
+  //   }
+  // }, [user]);
 
   return (
+    <>
+    {loading && <MainSpinner />}
     <section className="signup__section">
       <div className="signup__container signup">
           <div className="signup__images--box">
             <img src={SignupImg} alt="signup image" />
           </div>
           <div className="auth">
-            {/* {loading && <LoaderSpinner />} */}
             <h3 className="auth__heading">Register</h3>
             <div className="auth__head">
               <div className="auth__head--card">
@@ -176,17 +211,13 @@ const Register = () => {
                 )}
               </div>
               <div className="form__flex">
-                <input type="checkbox" className="form__check-box" id="check" />
+                <input type="checkbox" className="form__check-box" checked={true} id="check" onChange={(e) => setCheck((prev) => !prev)} />
                 <label htmlFor="checkbox" className="form__label">
                   I agree to the{" "}
                   <a href="#" className="form__link">
-                    Terms{" "}
-                  </a>{" "}
-                  &{" "}
+                    Terms </a> &
                   <a href="#" className="form__link">
-                    Privacy policy
-                  </a>
-                  .
+                    Privacy policy</a>.
                 </label>
               </div>
               <span className="form__extra">
@@ -197,7 +228,6 @@ const Register = () => {
                 <div className="loader__container">
                 <LoaderSpinner />
 
-                {/* <Loader /> */}
                 </div>
               ) : (
                 <div className="form__item">
@@ -208,15 +238,27 @@ const Register = () => {
               )}
             </form>
           </div>
-
-        {/* </div> */}
       </div>
-      {/* {isModalOpen && <OtpAuth email={email} onClose={closeModal} />} */}
-      {showOtpModal && <OtpAuth
+    </section>
+
+    {showOtpModal && <OtpAuth
       isOpen={showOtpModal}
       email={email} 
-      onClose={() => setShowOtpModal(false)} />} 
-    </section>
+      onClose={() => setShowOtpModal(false)} />
+    } 
+
+      <Alert alertType={`${isSuccess ? "success" : isError ? "error" : ""}`}>
+      {isSuccess ? (
+        <AiFillCheckCircle className="alert--icon" />
+      ) : isError ? (
+        <AiFillExclamationCircle className="alert--icon" />
+      ) : (
+        ""
+      )}
+      <p>{message}</p>
+      </Alert>
+
+    </>
   );
 };
 

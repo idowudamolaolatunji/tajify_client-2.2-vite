@@ -25,6 +25,7 @@ root.render(
     <AuthProvider>
       <DataProvider>
         <ToastContainer
+          style={{ zIndex: 20000000 }}
           position="top-center"
           autoClose={5000}
           hideProgressBar={false}

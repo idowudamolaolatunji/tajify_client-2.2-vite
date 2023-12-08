@@ -4,19 +4,41 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import otpVerificationImg from "../../assets/images/pngs/otp-verification.png";
 import axios from "axios";
-import LoaderSpinner from "../LoaderSpinner";
+import MainSpinner from "../MainSpinner";
 import OtpInput from "react-otp-input";
 import { HOST_URL } from "../../assets/js/help_func";
+import Alert from "../Alert";
+import { AiFillCheckCircle, AiFillExclamationCircle } from "react-icons/ai";
 
 const customStyles = {
-  background: "none", // Transparent black background
+  background: "none", 
+  position: 'fixed',
 };
 
 const OtpAuth = ({ isOpen, onClose, email }) => {
   const [otp, setOtp] = useState("");
-  const [errMsg, setErrMsg] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
+
+  
+  function handleError(mess) {
+		setIsError(true);
+		setMessage(mess);
+		setTimeout(() => {
+			setIsError(false);
+			setMessage("");
+		}, 2000);
+	}
+
+	function handleReset() {
+		setIsError(false);
+		setIsSuccess(false);
+		setMessage("");
+	}
 
   // Function to handle OTP input changes
   const handleOtpChange = (newOtp) => {
@@ -24,37 +46,75 @@ const OtpAuth = ({ isOpen, onClose, email }) => {
   };
 
   // Function to handle OTP resend
-  const handleResendClick = () => {
-    // Implement OTP resend logic (e.g., send a new OTP to the user's phone/email)
+  const handleResendOTP = async () => {
+    try {
+      handleReset();
+      setIsLoading(true);
+
+      const res = await fetch(`${HOST_URL()}/users/request-otp`, {
+        method: 'POST',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ email }),
+      });
+
+      if(!res.ok) throw new Error('Error Sending OTP');
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+
+      setIsSuccess(true);
+      setMessage(data.message)
+			setTimeout(() => {
+        setIsSuccess(false);
+				setMessage("");
+			}, 1000);
+
+    } catch (err) {
+      handleError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
   };
 
   const handleVerifyOtp = async () => {
     try {
-      const response = await axios.post(
-        `${HOST_URL()}/users/verifyOtp`,
-        { email, otp }
-      );
-      console.log(response);
-      if (response.data.status) {
-        setLoading(true);
-        toast.success("Otp successfully verified!");
-        navigate("/login"); // Replace with the desired path
-        // onClose(); // Close the modal
-      } else {
-        // OTP is incorrect, set an error message
-        toast.error("Invalid or Expired Otp");
-        setLoading(false);
+      handleReset();
+      setIsLoading(true);
+      const otpCode = parseInt(otp);
 
-        setErrMsg("Invalid OTP. Please try again.");
+      const res = await fetch(`${HOST_URL()}/users/verify-otp`, {
+        method: 'POST',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ email, otp:otpCode }),
+      });
+
+      if(!res.ok) throw new Error('Error Verifying OTP');
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
       }
-    } catch (error) {
-      // Handle any network or server errors here
-      console.error("Error verifying OTP:", error);
-      setErrMsg("An error occurred while verifying OTP.");
+
+      setIsSuccess(true);
+      setMessage(data.message)
+			setTimeout(() => {
+        setIsSuccess(false);
+				setMessage("");
+        navigate("/login"); 
+			}, 1000);
+
+    } catch (err) {
+      handleError(err.message)
+    } finally {
+      setIsLoading(false)
     }
   };
 
   return (
+    <>
+    { isLoading && <MainSpinner />}
     <Modal
       isOpen={isOpen}
       style={customStyles}
@@ -102,7 +162,7 @@ const OtpAuth = ({ isOpen, onClose, email }) => {
               >
                 Continue
               </button>
-              <button className="resend" onClick={handleResendClick}>
+              <button className="resend" onClick={handleResendOTP}>
                 Resend code
               </button>
             </div>
@@ -110,6 +170,18 @@ const OtpAuth = ({ isOpen, onClose, email }) => {
         </div>
       </div>
     </Modal>
+
+      <Alert alertType={`${isSuccess ? "success" : isError ? "error" : ""}`}>
+      {isSuccess ? (
+        <AiFillCheckCircle className="alert--icon" />
+      ) : isError ? (
+        <AiFillExclamationCircle className="alert--icon" />
+      ) : (
+        ""
+      )}
+      <p>{message}</p>
+      </Alert>
+      </>
   );
 };
 
