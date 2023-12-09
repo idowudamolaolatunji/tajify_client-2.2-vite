@@ -15,7 +15,7 @@ function DropdownMenu({}) {
 
 		// logging out
 		setTimeout(() => {
-      window.location.reload(true)
+      window.location.href = '/'
 		}, 1000)
 	}
 
