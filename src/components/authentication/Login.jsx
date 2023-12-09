@@ -1,9 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { useAuthContext } from "../../context/AuthContext";
-import axios from "../../Api/axios";
 import { AiFillCheckCircle, AiFillExclamationCircle, AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../../index.css";
 import "./auth.css";
@@ -37,8 +35,6 @@ const Login = () => {
   const [isError, setIsError] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  const [errMsg, setErrMsg] = useState("");
-  const [errors, setErrors] = useState(null);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -64,7 +60,6 @@ const Login = () => {
     try {
       e.preventDefault();
       setLoading(true);
-      // setErrMsg(""); // Reset error message
       handleReset()
 
       if(email === '' || password === '') return;
@@ -90,13 +85,9 @@ const Login = () => {
         setIsSuccess(false);
 				setMessage("");
 				handleChange(data.data.user, data.token);
-			}, 1200);
-      // toast.success("Login Success!");
+			}, 2000);
 
     } catch(err) {
-      // setErrMsg(err.message);
-      // toast.error(err.message);
-      // setErrors(err.message);
       handleError(err.message)
     } finally {
       setLoading(false)
@@ -111,6 +102,8 @@ const Login = () => {
 
   return (
     <>
+        {loading && <MainSpinner />}
+
     <section className="login__section">
       <div className="login__container login">
         <div className="auth">
@@ -180,7 +173,6 @@ const Login = () => {
             <div className="form__item">
               <button className="form__submit">Login</button>
             </div>
-            {errMsg && <p className="error">{errMsg}</p>}
             <span className="form__extra">
               New to Tajify? <Link to="/signup">Create Account</Link>
             </span>
@@ -189,13 +181,6 @@ const Login = () => {
         <div className="login__slide">
           <img src={Image1} alt="login slides" className="login__image" />
         </div>
-        {loading && (
-          <div className="loader__container">
-            <LoaderSpinner />
-            {/* <Loader /> */}
-
-          </div>
-        )}
       </div>
     </section>
 

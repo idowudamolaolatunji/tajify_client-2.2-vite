@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import otpVerificationImg from "../../assets/images/pngs/otp-verification.png";
-import axios from "axios";
 import MainSpinner from "../MainSpinner";
 import OtpInput from "react-otp-input";
 import { HOST_URL } from "../../assets/js/help_func";
@@ -103,7 +101,7 @@ const OtpAuth = ({ isOpen, onClose, email }) => {
         setIsSuccess(false);
 				setMessage("");
         navigate("/login"); 
-			}, 1000);
+			}, 2000);
 
     } catch (err) {
       handleError(err.message)
