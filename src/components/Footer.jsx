@@ -1,6 +1,7 @@
 import React from 'react';
 import { AiOutlineInstagram, AiFillFacebook, AiFillTwitterSquare } from 'react-icons/ai';
 import { BsPinterest } from 'react-icons/bs'
+import WhiteLogo from '../assets/images/pngs/logo-complete-white.png'
 
 function Footer() {
     return (
@@ -30,7 +31,9 @@ function Footer() {
                     </ul>
                 </div>
                 <div className="logo-n-copyright">
-                    <span className="footer__logo">Tajify</span>
+                    <span className="footer__logo">
+                        <img src={WhiteLogo} alt='footer logo' />
+                    </span>
                     <span className="footer__copyright">
                         <p className="footer__copyright--text">© 2023 Tajify. All right reserved.</p>
                         <ul className="footer__copyright--links">
