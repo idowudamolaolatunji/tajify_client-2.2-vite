@@ -2,6 +2,7 @@ import React from 'react';
 import { AiOutlineInstagram, AiFillFacebook, AiFillTwitterSquare } from 'react-icons/ai';
 import { BsPinterest } from 'react-icons/bs'
 import WhiteLogo from '../assets/images/pngs/logo-complete-white.png'
+import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
@@ -18,10 +19,10 @@ function Footer() {
 
                 <div className="links-n-socials">
                     <ul className="links__list">
-                        <li><a href="#" className="links__link">About Us</a></li>
-                        <li><a href="#" className="links__link">How It Works</a></li>
-                        <li><a href="#" className="links__link">FAQ</a></li>
-                        <li><a href="#" className="links__link">Creators</a></li>
+                        <li><Link to={'/'} className="links__link">About Us</Link></li>
+                        <li><Link to={'/'} className="links__link">How It Works</Link></li>
+                        <li><Link to={'/'} className="links__link">FAQ</Link></li>
+                        <li><Link to={'/'} className="links__link">Creators</Link></li>
                     </ul>
                     <ul className="socials__icons">
                         <li><a href="#" className="social__icon--links"><AiOutlineInstagram /></a></li>
@@ -37,8 +38,8 @@ function Footer() {
                     <span className="footer__copyright">
                         <p className="footer__copyright--text">© 2023 Tajify. All right reserved.</p>
                         <ul className="footer__copyright--links">
-                            <li><a href="#" className="footer__copyright--link">Privacy Policy</a></li>
-                            <li><a href="#" className="footer__copyright--link">Terms of Service</a></li>
+                            <li><Link to={'/'} className="footer__copyright--link">Privacy Policy</Link></li>
+                            <li><Link to={'/'} className="footer__copyright--link">Terms of Service</Link></li>
                         </ul>
                     </span>
                 </div>

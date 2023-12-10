@@ -4,6 +4,7 @@ import FeaturedArticleFigure from './FeaturedArticleFigure';
 import article3 from '../assets/images/pngs/article3.png';
 import article4 from '../assets/images/pngs/article4.png';
 import article5 from '../assets/images/pngs/article5.png';
+import { Link } from "react-router-dom";
 const FeaturedArticleData = [
     {
         title: 'The Great AI Disruption: Six Startling Predictions That Will Shape Our Lives and Test.',
@@ -34,7 +35,7 @@ function FeaturedArticles() {
                     return <FeaturedArticleFigure key={article.imagePath} title={article.title} imagePath={article.imagePath} text={article.text} time={article.time} />
                 })}
             </div>
-            <a href="#" className='view-more'>view more...</a>
+            <Link to={'/coming-soon'} className='view-more'>view more...</Link>
         </div>
     );
 }

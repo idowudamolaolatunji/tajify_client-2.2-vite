@@ -1,4 +1,8 @@
 /* NAV AND HEADER */
+.main-header.main-mobile {
+	display: none;
+	opacity: 0;
+}
 .main-header {
 	height: 9rem;
 	background-color: #fff;
@@ -65,6 +69,7 @@ ol {
 	font-weight: 500;
 	transition: all 0.35s;
 }
+.navbar__item.nav-active,
 .navbar__item:hover,
 .navbar--others-icon:hover {
 	color: #ff0066;
@@ -123,4 +128,113 @@ ol {
 .nav__button.signup:hover {
 	box-shadow: inset 0 0 0 1.4px #777;
 	color: #777 !important;
+}
+
+
+/* ================================== */
+/* HEADER MEDIA QUERY */
+/* ================================== */
+
+
+/* 1170rem === 117rem === 73.125em */
+@media screen and (max-width: 73.125em) {
+    html {
+        font-size: 61%;
+    }
+    .main-header {
+        gap: 6.2rem;
+    }
+    .navbar__list {
+        gap: 2.6rem;
+    }
+}
+
+
+/* 1100px === 110rem === 68.75em */
+@media screen and (max-width: 68.75em) {
+    .main-header {
+        gap: 10rem;
+    }
+    .main-header .header__input {
+        display: none;
+    }
+    .logo__box img {
+        width: 6.2rem !important;
+        height: 100%;
+    }
+}
+
+
+/* 970px === 97rem === 60.625em */
+@media screen and (max-width: 60.625em) {
+    html {
+        font-size: 56.25%;
+    }
+}
+
+
+/* 800px === 80rem === 50em */
+@media screen and (max-width: 50em) {
+    .main-header {
+        gap: 5rem;
+    }
+    .navbar--profile .profile-user {
+        display: none;
+    }
+}
+
+
+/* 700px === 70rem === 43.75em */
+@media screen and (max-width: 44.75em) {
+    .main-header.main {
+        display: none;
+        opacity: 0;
+    }
+    .main-header.main-mobile {
+        display: flex;
+        opacity: 1;
+        gap: 0;
+        justify-content: space-between;
+    }
+    .navbar--others-icon {
+        font-size: 2.6rem;
+        color: #666;
+    }
+    .mobile-navbar__list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        max-width: 30rem;
+        width: 30rem;
+        max-height: 49rem;
+        background-color: #fff;
+        padding: 2.4rem 3rem;
+        
+        position: absolute;
+        top: 9rem;
+        right: 0;
+    }
+    .mobile-navbar__list .navbar__item {
+        flex-direction: row;
+        gap: 1.6rem;
+        align-items: center;
+        font-weight: 500;
+        color: #555;
+        font-size: 1.4rem;
+    }
+	.nav__button {
+		font-size: 1.4rem;
+	}
+    
+}
+
+
+/* 450px === 45rem === 28.125em */
+@media screen and (max-width: 28.125em) {
+    .navbar--others {
+        gap: 1.4rem;
+    }
+	.mobile-navbar__list .navbar__item {
+        font-size: 1.2rem;
+    }
 }

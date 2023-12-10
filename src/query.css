@@ -128,4 +128,20 @@
     .info--icons {
         margin-top: .6rem;
     }
+    
+}
+
+/* 600px === 60rem === 37.5em */
+@media screen and (max-width: 37.5em) {
+    .news__figure {
+        grid-template-columns: 2.5fr 3fr;
+    }
+}
+
+/* 450px === 45rem === 28.125em */
+@media screen and (max-width: 28.125em) {
+    .news__figure {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
 }
