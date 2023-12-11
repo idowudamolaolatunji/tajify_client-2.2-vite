@@ -203,12 +203,12 @@ ol {
     .mobile-navbar__list {
         display: flex;
         flex-direction: column;
-        gap: 1.2rem;
+        gap: 1.8rem;
         max-width: 30rem;
         width: 30rem;
         max-height: 49rem;
         background-color: #fff;
-        padding: 2.4rem 3rem;
+        padding: 2.4rem 3rem 3.4rem;
         
         position: absolute;
         top: 9rem;
