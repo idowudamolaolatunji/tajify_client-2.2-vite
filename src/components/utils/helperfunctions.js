@@ -52,3 +52,4 @@ export default fetchData = async () => {
     console.error("Error:", error);
   }
 };
+
