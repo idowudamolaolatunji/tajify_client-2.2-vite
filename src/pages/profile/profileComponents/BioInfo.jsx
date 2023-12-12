@@ -257,3 +257,9 @@ function BioInfo() {
 // }
 
 export default BioInfo;
+
+
+// "@ckeditor/ckeditor5-build-classic": "^39.0.1",
+// "@ckeditor/ckeditor5-react": "^4.0.0",
+// "ckeditor5-custom-build": "file:ckEditor",
+

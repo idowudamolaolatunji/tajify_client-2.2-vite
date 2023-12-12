@@ -28,6 +28,11 @@ import Sport from "./pages/Categories/categoriesComponents/Sport";
 import Technology from "./pages/Categories/categoriesComponents/Technology";
 import CreatorsProfile from "./pages/creatorsProfile/Index";
 import Settings from "./pages/settings/index";
+import AccountPage from "./pages/userArea/AccountPage";
+import Library from "./pages/userArea/Library";
+import MyOrders from "./pages/userArea/MyOrders";
+import CreateBlog from "./pages/userArea/CreateBlog";
+import PaymentPage from "./pages/blogPayment/PaymentPage";
 // import ThankYou from "./pages/thankyou/ThankYou";
 
 
@@ -40,6 +45,13 @@ function App() {
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
           <Route path="/settings" element={<Settings />}></Route>
+         <Route path="/blogs/dashboard" element={<AccountPage/>} />
+         <Route path="/blogs/dashboard/library" element={<Library/>} />
+         {/* <Route path="/blogs/dashboard/library/:slug" element={<LibraryItemDetails/>} /> */}
+         <Route path="/blogs/dashboard/create-blog" element={<CreateBlog/>} />
+
+
+
 
           {/* thank you */}
           {/* <Route path="/thank-you/:ref" element={<ThankYou />} /> */}
@@ -60,6 +72,8 @@ function App() {
           <Route path="/help" element={<Help />}></Route>
           <Route path="/about" element={<About />}></Route>
           <Route path="/category/:category" element={<Category />}></Route>
+         <Route path="/online-payment" element={<PaymentPage/>} />
+
 
 
           <Route path="/category/health" element={<Health />}></Route>

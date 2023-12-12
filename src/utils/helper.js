@@ -37,3 +37,11 @@ export function dateConverter(givenDate) {
       return inputDate.format('MMM Do YYYY, h:mm A');
     }
 }
+
+export function truncateText (text, wordCount) {
+    const words = text.split(' ');
+    if (words.length > wordCount) {
+      return words.slice(0, wordCount).join(' ') + '...';
+    }
+    return text;
+  };

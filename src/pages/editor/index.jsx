@@ -182,7 +182,7 @@ const EditorPage = () => {
             </div>
           </div>
 
-          <CKEditor
+          {/* <CKEditor
             editor={ClassicEditor}
             data={text}
             config={{
@@ -193,7 +193,7 @@ const EditorPage = () => {
               const data = editor.getData();
               setText(data);
             }}
-          />
+          /> */}
         
 
           <FormControl id="category" className="mt-6">

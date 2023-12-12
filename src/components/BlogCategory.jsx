@@ -10,10 +10,10 @@ import { useAuthContext } from "../context/AuthContext";
 import { HOST_URL } from "../assets/js/help_func";
 
 // const All_BLOGS_URL = "http://localhost:3005/api/blogs"; // Updated API URL
-const All_BLOGS_URL = `${HOST_URL()}/api/blogs`// Updated API URL
+const All_BLOGS_URL = `${HOST_URL()}/blogs`// Updated API URL
 // const All_BLOGS_URL = "https://api.tajify.com/api/blogs"; // Updated API URL
 // const All_USERS_URL = "https://api.tajify.com/api/users"; // Updated API URL
-const All_USERS_URL = `${HOST_URL()}/api/users`; // Updated API URL
+const All_USERS_URL = `${HOST_URL()}/users`; // Updated API URL
 
 const BlogCategory = ({ category }) => {
   const { token } = useAuthContext();
