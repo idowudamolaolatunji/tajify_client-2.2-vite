@@ -32,6 +32,7 @@ import AccountPage from "./pages/userArea/AccountPage";
 import Library from "./pages/userArea/Library";
 import MyOrders from "./pages/userArea/MyOrders";
 import CreateBlog from "./pages/userArea/CreateBlog";
+import PaymentPage from "./pages/blogPayment/PaymentPage";
 // import ThankYou from "./pages/thankyou/ThankYou";
 
 
@@ -71,6 +72,8 @@ function App() {
           <Route path="/help" element={<Help />}></Route>
           <Route path="/about" element={<About />}></Route>
           <Route path="/category/:category" element={<Category />}></Route>
+         <Route path="/online-payment" element={<PaymentPage/>} />
+
 
 
           <Route path="/category/health" element={<Health />}></Route>

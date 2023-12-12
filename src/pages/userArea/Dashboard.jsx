@@ -47,7 +47,10 @@ const Dashboard = ({ children }) => {
           </div>
         </div>
       </div>
+      <div className="mt-[240px]">
       <Footer />
+
+      </div>
     </>
   );
 };

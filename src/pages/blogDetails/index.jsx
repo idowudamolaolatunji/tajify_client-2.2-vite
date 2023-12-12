@@ -38,7 +38,6 @@ import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import Premium from "../../components/Premium";
 import BlogNavbar from "../../components/Navbar";
 
-
 const BlogDetails = () => {
   const { user, token } = useAuthContext();
   const { id } = useParams(); // This retrieves the ID from the URL parameter
@@ -64,6 +63,7 @@ const BlogDetails = () => {
   const [relatedBlogs, setRelatedBlogs] = useState([]);
   const [error, setError] = useState(null);
   const [premium, setPremium] = useState(false);
+  const [truncatedContent, setTruncatedContent] = useState("");
 
   // const SINGLE_BLOGS_URL = `http://localhost:3005/api/blogs/${id}`;
   const USER_URL = `${HOST_URL()}/users/${id}`; // Replace with your actual API endpoint
@@ -222,6 +222,19 @@ const BlogDetails = () => {
           // Handle the fetched data and set it in state
           setPost(response.data.data.blog);
           setPremium(response.data.data.blog.isPremium);
+          // Truncate the content and store it in state
+          const maxLength = 100; // You can adjust the desired length
+          const truncated = truncateText(
+            response.data.data.blog.content,
+            maxLength
+          );
+          setTruncatedContent(truncated);
+
+          // Set post state
+          setPost({
+            ...blogData,
+            content: truncatedContent,
+          });
         } else {
           console.error("Error fetching posts");
         }
@@ -236,9 +249,11 @@ const BlogDetails = () => {
     fetchData();
   }, [id, token]);
 
-  // const premium = (post.isPremium)
+  console.log(truncatedContent);
 
+  console.log(creator);
   console.log(premium);
+
   //  Truncate text to either 1000 words or 10 lines
   const truncateText = (text, maxLength) => {
     const words = text.split(" ");
@@ -280,29 +295,6 @@ const BlogDetails = () => {
     fetchRelatedBlogs();
   }, []);
 
-  // FOR ALL CREATORS
-  // useEffect(() => {
-  //   // Fetch the list of creators from your API
-  //   // fetch("http://localhost:3005/api/users")
-  //   fetch("https://api.tajify.com/api/users")
-  //     // fetch(`https://api.tajify.com/api/users/username/${id}`)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       const users = data.data.users;
-  //       setCreators(users);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       setError(error);
-  //       setLoading(false);
-  //       console.error("Error fetching creators:", error);
-  //     });
-  // }, []);
 
   useEffect(() => {
     fetchData();
@@ -315,7 +307,6 @@ const BlogDetails = () => {
           <Navbar />
         </div> */}
         <BlogNavbar />
-
 
         {loading ? (
           <div className="loader__container">
@@ -445,11 +436,28 @@ const BlogDetails = () => {
                   />
                 </div>
               </div>
+
               <div className="paragraph__container">
-                <p
-                  className="details__paragraph"
-                  dangerouslySetInnerHTML={{ __html: post?.content }}
-                />
+                <div className="">
+                  <p
+                    className="details__paragraph "
+                    dangerouslySetInnerHTML={{ __html: truncatedContent }}
+                  />
+                  {premium && (
+                    <div className="subscription__fee flex items-center justify-evenly">
+                      This blog post is premium and cost{" "}
+                      <Currency
+                        quantity={post.subscriptionFee}
+                        currency="NGN"
+                      />
+                      <Link to="/online-payment">
+                      <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
+                        Subscribe
+                      </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="membership">
