@@ -19,19 +19,15 @@ import { IoShareOutline } from "react-icons/io5";
 import { AiOutlineComment } from "react-icons/ai";
 import { BsSave } from "react-icons/bs";
 import axios from "axios";
-// import "../../index.css";
 import "../../pages/blogDetails/blogDetails.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
-import TreadingArticles from "../../components/TreadingArticles";
+import Cookies from 'js-cookie';
 import { useAuthContext } from "../../context/AuthContext";
-import Profile from "../../components/Profile";
 // import Loader from "../../components/Loader";
 import LoaderSpiner from "../../components/LoaderSpinner";
 import Comments from "../../components/comments/Comments";
 import Notification from "../../components/notification/Notification";
-// import CategoryHead from "../Categories/categoriesComponents/CategoryHead";
-import CategoryBlogs from "../Categories/categoriesComponents/CategoryBlogs";
 import { HOST_URL } from "../../assets/js/help_func";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import ArticleSocialInfo from "../../components/ArticleSocialInfo";
@@ -245,12 +241,15 @@ const BlogDetails = () => {
         setLoading(false);
       }
     };
-
+    
     fetchData();
   }, [id, token]);
-
-  console.log(truncatedContent);
-
+  
+  
+  // Set id and price as cookies
+  Cookies.set('singleBlogId', post._id);
+  Cookies.set('singleBlogPrice', post.subscriptionFee);
+  
   console.log(creator);
   console.log(premium);
 
@@ -295,7 +294,6 @@ const BlogDetails = () => {
     fetchRelatedBlogs();
   }, []);
 
-
   useEffect(() => {
     fetchData();
   }, [id, user, userId, token]);
@@ -303,9 +301,6 @@ const BlogDetails = () => {
   {
     return (
       <div className="blog__container">
-        {/* <div className="header__style">
-          <Navbar />
-        </div> */}
         <BlogNavbar />
 
         {loading ? (
@@ -451,9 +446,9 @@ const BlogDetails = () => {
                         currency="NGN"
                       />
                       <Link to="/online-payment">
-                      <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
-                        Subscribe
-                      </button>
+                        <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
+                          Subscribe
+                        </button>
                       </Link>
                     </div>
                   )}
