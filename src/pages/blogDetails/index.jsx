@@ -439,8 +439,8 @@ const BlogDetails = () => {
               <div className="blog__post--picture">
                 <div className="main__news__img">
                   <img
-                    src={post.image}
-                    alt={`Image for ${post.title}`}
+                    src={post?.image}
+                    alt={`Image for ${post?.title}`}
                     className="align-middle w-full object-cover transition duration-300 ease-linear mb-5"
                   />
                 </div>
@@ -448,23 +448,23 @@ const BlogDetails = () => {
               <div className="paragraph__container">
                 <p
                   className="details__paragraph"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: post?.content }}
                 />
               </div>
 
               <div className="membership">
                 <div className="referal__link">
                   {/* <h2>
-                    Join Tajify with my referral link — <a>{post.author}</a>
+                    Join Tajify with my referral link — <a>{post?.author}</a>
                   </h2> */}
                   <h2>
                     Join Tajify with my referral link —{" "}
                     <a
-                      href={post.author}
+                      href={post?.author}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {post.author}
+                      {post?.author}
                     </a>
                   </h2>
 
@@ -550,24 +550,24 @@ const BlogDetails = () => {
                     <div className="article__content--box">
                       <div className="article__author-info">
                         <img
-                          src={post.creator.image}
+                          src={post.creator?.image}
                           alt={`author image: ${AvatarImg}`}
                           className="article-author__image"
                         />
                         <span className="author">
                           <Link to={`/${post.author}/blogs`}>
-                            <h4 className="article__author">{post.author}</h4>
+                            <h4 className="article__author">{post?.author}</h4>
                           </Link>
-                          <p className="article__time">{post.time}</p>
+                          <p className="article__time">{post?.time}</p>
                         </span>
                         <HiOutlineDotsVertical
                           style={{ cursor: "pointer", marginLeft: "auto" }}
                         />
                       </div>
-                      <h3 className="article__heading">{post.title}</h3>
+                      <h3 className="article__heading">{post?.title}</h3>
                       <div
                         className="article__text"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
+                        dangerouslySetInnerHTML={{ __html: post?.content }}
                       ></div>
 
                       <ArticleSocialInfo avatarImg={AvatarImg} />
