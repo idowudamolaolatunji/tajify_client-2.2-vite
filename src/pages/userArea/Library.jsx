@@ -4,6 +4,7 @@ import Dashboard from './Dashboard'
 // import { usePageContext } from '../../context/PageContext'
 // import { useDataContext } from '../../context/DataContext'
 import DataTabs from '../../components/DataTabs'
+import AllBlogsLibrary from './AllBlogsLibrary';
 
 const Library = () => {
   const [loading, setLoading] = useState(false);
@@ -60,11 +61,12 @@ const Library = () => {
       </div>
       
 
-      {
+      {/* {
         data?.map((i) => (
           <LibraryListingCard data={i} key={i.id}/>
-        ))
-      }
+          ))
+        } */}
+        <AllBlogsLibrary />
         
     </Dashboard>
     </>

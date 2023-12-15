@@ -22,7 +22,7 @@ import axios from "axios";
 import "../../pages/blogDetails/blogDetails.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { useAuthContext } from "../../context/AuthContext";
 // import Loader from "../../components/Loader";
 import LoaderSpiner from "../../components/LoaderSpinner";
@@ -219,7 +219,7 @@ const BlogDetails = () => {
           setPost(response.data.data.blog);
           setPremium(response.data.data.blog.isPremium);
           // Truncate the content and store it in state
-          const maxLength = 100; // You can adjust the desired length
+          const maxLength = 200; // You can adjust the desired length
           const truncated = truncateText(
             response.data.data.blog.content,
             maxLength
@@ -241,15 +241,17 @@ const BlogDetails = () => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [id, token]);
-  
-  
+
+
+  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
+
   // Set id and price as cookies
-  Cookies.set('singleBlogId', post._id);
-  Cookies.set('singleBlogPrice', post.subscriptionFee);
-  
+  Cookies.set("singleBlogId", post._id);
+  Cookies.set("singleBlogPrice", post.subscriptionFee);
+
   console.log(creator);
   console.log(premium);
 
@@ -434,10 +436,14 @@ const BlogDetails = () => {
 
               <div className="paragraph__container">
                 <div className="">
-                  <p
-                    className="details__paragraph "
-                    dangerouslySetInnerHTML={{ __html: truncatedContent }}
-                  />
+                  {premium ? (
+                    <p
+                      className="details__paragraph "
+                      dangerouslySetInnerHTML={{ __html: truncatedContent }}
+                    />
+                  ) : (
+                    <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                  )}
                   {premium && (
                     <div className="subscription__fee flex items-center justify-evenly">
                       This blog post is premium and cost{" "}
@@ -457,20 +463,18 @@ const BlogDetails = () => {
 
               <div className="membership">
                 <div className="referal__link">
-                  {/* <h2>
-                    Join Tajify with my referral link — <a>{post?.author}</a>
-                  </h2> */}
+                 
                   <h2>
                     Join Tajify with my referral link —{" "}
                     <a
-                      href={post?.author}
+                      href={`https://${referralUrlWithWWW}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {post?.author}
+                      {referralUrlWithWWW}
                     </a>
+                  
                   </h2>
-
                   <h3 className="member">
                     As a Tajify member, a portion of your membership fee goes to
                     writers you read, and you get full access to every story…

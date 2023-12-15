@@ -181,8 +181,8 @@ const EditorPage = () => {
               </div>
             </div>
           </div>
-
-          {/* <CKEditor
+{/* 
+          <CKEditor
             editor={ClassicEditor}
             data={text}
             config={{
