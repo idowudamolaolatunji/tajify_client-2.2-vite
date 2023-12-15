@@ -256,7 +256,7 @@ const PaymentPage = () => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className="w-[250px]">
               <div className="filter-div shadow-xl rounded-md p-4 border-t-2 h-[150px]">
                 <h3 className="border-b pb-2">Checkout Price</h3>
 
