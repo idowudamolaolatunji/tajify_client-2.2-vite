@@ -263,7 +263,7 @@ function MainGreenHeader() {
             </li>
 
             {!user && 
-              <Link to="/coming-soon">
+              <Link to="/signup">
                 <li className="navbar__item">
                   Become a Creator
                 </li>

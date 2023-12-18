@@ -81,11 +81,9 @@ function Article({ image, AvatarImg, articleViews, articleLikes, articleComments
 		<figure className="article__figure">
 			{trendingBlogs.map((post) => (
 				<div key={post._id} className="lifestylee">
-					{/* {posts.map((post) => ( */}
 					<Link to={`/details/${post._id}`}>
 						<div className="article__image--box">
 							<img
-								// src={image}
 								src={post.image}
 								alt={`article on ${image}`}
 								className="article__image"
@@ -110,14 +108,14 @@ function Article({ image, AvatarImg, articleViews, articleLikes, articleComments
 
 								<p className="article__time">{post.time}</p>
 							</span>
-              <span className="author__others">
-              <div className="premium">
-								<Premium />
-							</div>
-							<HiOutlineDotsVertical
-								style={{ cursor: "pointer" }}
-							/>
-              </span>
+							<span className="author__others">
+								<div className="premium">
+									<Premium />
+								</div>
+								{/* <HiOutlineDotsVertical
+									style={{ cursor: "pointer" }}
+								/> */}
+              				</span>
 							
 						</div>
 
@@ -134,9 +132,8 @@ function Article({ image, AvatarImg, articleViews, articleLikes, articleComments
 						<ArticleSocialInfo
 							avatarImg={AvatarImg}
 							articleComments={articleComments}
-							articleViews={articleViews}
-							articleLikes={articleLikes}
 							postId={post._id}
+							totalLikes={post.likesCounts}
 						/>
 					</div>
 				</div>

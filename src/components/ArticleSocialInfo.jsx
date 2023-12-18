@@ -31,58 +31,82 @@
 
 // export default ArticleSocialInfo;
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { LiaComments } from "react-icons/lia";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 function ArticleSocialInfo({
   avatarImg,
   articleComments,
-  articleViews,
-  initialLikes,
   postId,
+  totalLikes,
 }) {
   //   const [likes, setLikes] = useState(initialLikes);
-  const [likes, setLikes] = useState(5);
+  const [likes, setLikes] = useState(totalLikes);
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
 
-  const toggleLike = () => {
-    // Simulate toggling the like on the client side
-    if (liked) {
-      setLikes(likes - 1);
-    } else {
-      setLikes(likes + 1);
-    }
+  const { user, token } = useAuthContext();
 
-    // Toggle liked state
-    setLiked(!liked);
-
-    // Make an API request to the server to update the like status
-    // You'll need to implement this part on your Node.js server
-
-    // Example using fetch:
-
-    // fetch("http://localhost:3005/api/blogs/like-post/:blogId", {
-    fetch("https://api.tajify.com/api/blogs/like-post/:blogId", {
-      method: "POST",
-      body: JSON.stringify({ articleId: "your_article_id", liked: !liked }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          // Like status updated successfully
-        } else {
-          // Handle error
+  useEffect(() => {
+    async function fetchCurrPost() {
+      try {
+        const res = await fetch(`http://localhost:3005/api/blogs/${postId}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": 'application/json',
+          }
+        });
+        const data = await res.json();
+        if(data.data.blog.likes.includes(user._id)) {
+          setLiked(true)
         }
-      })
-      .catch((error) => {
-        // Handle error
-      });
+      } catch(err) {
+        console.error(err.message)
+      }
+    }
+    fetchCurrPost()
+  }, [likes])
+
+  
+  const toggleLike = async () => {
+    try {
+      if (liked) {
+        setLikes(likes - 1);
+        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${postId}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+  
+      } else {
+        setLikes(likes + 1);
+        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${postId}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+      }
+  
+      // Toggle liked state
+      setLiked(!liked);
+
+    } catch(err) {
+      console.error(err.message)
+    }
   };
 
   const toggleComments = () => {
@@ -106,15 +130,15 @@ function ArticleSocialInfo({
           <img src={avatarImg} alt={"article views"} />
           <img src={avatarImg} alt={"article views"} />
         </span>
-        <p className="article__social--figure">+ {articleViews} views</p>
+        <p className="article__social--figure">+ {''} views</p>
       </div>
       <div className="social--info">
         {liked ? (
-          <AiFillHeart onClick={toggleLike} style={{ color: "red" }} />
+          <AiFillHeart onClick={toggleLike} className="post--like" />
         ) : (
           <AiOutlineHeart onClick={toggleLike} />
         )}
-        <p className="article__social--figure">{likes} likes</p>
+        <p className="article__social--figure">{likes === 0 ? '' : likes} likes</p>
       </div>
       <Link to={`/details/${postId}?commentBar=true`}>
         <div className="social--info">

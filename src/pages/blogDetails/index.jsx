@@ -10,7 +10,10 @@ import {
   AiFillTwitterSquare,
   AiFillHeart,
   AiOutlineHeart,
+  AiFillCheckCircle,
+  AiFillExclamationCircle,
 } from "react-icons/ai";
+import { FiCopy } from "react-icons/fi";
 import AvatarImg from "../../assets/images/pngs/avatar.png";
 import { BsPinterest } from "react-icons/bs";
 // import { PiHandsClappingThin } from "react-icons/pi";
@@ -34,6 +37,10 @@ import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import Premium from "../../components/Premium";
 import BlogNavbar from "../../components/Navbar";
 
+/////////////////////////////////////////////////////////
+import Alert from '../../components/Alert';
+
+
 const BlogDetails = () => {
   const { user, token } = useAuthContext();
   const { id } = useParams(); // This retrieves the ID from the URL parameter
@@ -49,7 +56,7 @@ const BlogDetails = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const [isShared, setIsShared] = useState(false);
-  const [likes, setLikes] = useState(5);
+  const [likes, setLikes] = useState(post.likesCount || 0);
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -60,6 +67,13 @@ const BlogDetails = () => {
   const [error, setError] = useState(null);
   const [premium, setPremium] = useState(false);
   const [truncatedContent, setTruncatedContent] = useState("");
+
+  /////////////////////////////////////////////////////////////
+  const [showAlert, setShowAlert] = useState(false);
+  const [message, setMessage] = useState('');
+
+
+  console.log(post)
 
   // const SINGLE_BLOGS_URL = `http://localhost:3005/api/blogs/${id}`;
   const USER_URL = `${HOST_URL()}/users/${id}`; // Replace with your actual API endpoint
@@ -159,21 +173,81 @@ const BlogDetails = () => {
     }
   };
 
-  // FUNCTION TO TOGGLE LIKE
-  const toggleLike = () => {
-    // Simulate toggling the like on the client side
-    if (liked) {
-      setLikes(likes - 1);
-    } else {
-      setLikes(likes + 1);
+  
+  //////////////////////////////////////////////////////////
+  useEffect(() => {
+    async function fetchCurrPost() {
+      try {
+        const res = await fetch(`http://localhost:3005/api/blogs/${post._id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": 'application/json',
+          }
+        });
+        const data = await res.json();
+        if(data.data.blog.likes.includes(user._id)) {
+          setLiked(true)
+        }
+      } catch(err) {
+        console.error(err.message)
+      }
     }
+    fetchCurrPost()
+  }, [likes])
 
-    // Toggle liked state
-    setLiked(!liked);
+  
+  const toggleLike = async () => {
+    try {
+      if (liked) {
+        setLikes(likes - 1);
+        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+  
+      } else {
+        setLikes(likes + 1);
+        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+      }
+  
+      // Toggle liked state
+      setLiked(!liked);
 
-    // Make an API request to the server to update the like status
-    // You'll need to implement this part on your Node.js server
+    } catch(err) {
+      console.error(err.message)
+    }
   };
+
+  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
+
+
+
+  function copyInput() {
+    navigator.clipboard.writeText(`https://${referralUrlWithWWW}`);
+    setShowAlert(true);
+    setMessage('Link Copied!')
+    setTimeout(() => {
+      setShowAlert(false);
+      setMessage('')
+    }, 2000);
+}
+  ///////////////////////////////////////////////////////
+
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -246,7 +320,6 @@ const BlogDetails = () => {
   }, [id, token]);
 
 
-  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
 
   // Set id and price as cookies
   Cookies.set("singleBlogId", post._id);
@@ -302,6 +375,7 @@ const BlogDetails = () => {
 
   {
     return (
+      <>
       <div className="blog__container">
         <BlogNavbar />
 
@@ -367,8 +441,7 @@ const BlogDetails = () => {
                           {liked ? (
                             <AiFillHeart
                               onClick={toggleLike}
-                              className="writer__icons"
-                              style={{ color: "red" }}
+                              className="writer__icons post--like"
                             />
                           ) : (
                             <AiOutlineHeart
@@ -464,15 +537,15 @@ const BlogDetails = () => {
               <div className="membership">
                 <div className="referal__link">
                  
-                  <h2>
-                    Join Tajify with my referral link —{" "}
-                    <a
+                  <h2 className="link--text">
+                    Join Tajify with my referral link <FiCopy style={{ cursor: 'pointer', color: '#555' }} onClick={copyInput} />
+                    {/* <a
                       href={`https://${referralUrlWithWWW}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {referralUrlWithWWW}
-                    </a>
+                    </a> */}
                   
                   </h2>
                   <h3 className="member">
@@ -587,6 +660,16 @@ const BlogDetails = () => {
         </div>
         <Footer />
       </div>
+
+
+        <Alert alertType={`${showAlert && "success" }`}>
+            {showAlert && (
+              <AiFillCheckCircle className="alert--icon" />
+            )}
+            <p>{message}</p>
+        </Alert>
+
+      </>
     );
     {
       /* })

@@ -338,6 +338,28 @@ img__preview--container {
   /* background: #333; */
 }
 
+.link--text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.post--like {
+  transition: all .35s;
+  color: red;
+  animation: scale-in .35s ease-in;
+}
+@keyframes scale-in {
+  0% {
+    transform: scale(0.7);
+  } 50% {
+    transform: scale(1.35);
+  } 100% {
+    transform: scale(1);
+  }
+  
+}
+
+
 .tags__container {
   display: flex;
   justify-content: center;
