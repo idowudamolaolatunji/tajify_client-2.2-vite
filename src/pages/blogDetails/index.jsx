@@ -178,7 +178,7 @@ const BlogDetails = () => {
   useEffect(() => {
     async function fetchCurrPost() {
       try {
-        const res = await fetch(`http://localhost:3005/api/blogs/${post._id}`, {
+        const res = await fetch(`https://test.tajify.com/api/blogs/${post._id}`, {
           method: 'GET',
           headers: {
             "Content-Type": 'application/json',
@@ -200,7 +200,7 @@ const BlogDetails = () => {
     try {
       if (liked) {
         setLikes(likes - 1);
-        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${post._id}`, {
+        const res = await fetch(`https://test.tajify.com/api/blogs/unlike-post/${post._id}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": 'application/json',
@@ -213,7 +213,7 @@ const BlogDetails = () => {
   
       } else {
         setLikes(likes + 1);
-        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${post._id}`, {
+        const res = await fetch(`https://test.tajify.com/api/blogs/like-post/${post._id}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": "application/json",
@@ -236,7 +236,6 @@ const BlogDetails = () => {
   const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
 
 
-
   function copyInput() {
     navigator.clipboard.writeText(`https://${referralUrlWithWWW}`);
     setShowAlert(true);
@@ -245,7 +244,7 @@ const BlogDetails = () => {
       setShowAlert(false);
       setMessage('')
     }, 2000);
-}
+  }
   ///////////////////////////////////////////////////////
 
 

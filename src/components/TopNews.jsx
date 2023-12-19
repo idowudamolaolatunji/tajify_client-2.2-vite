@@ -60,7 +60,7 @@ function TopNews({ posts, isLoading, setIsLoading }) {
 
 	return (
 		<div className="topnews">
-			<h3 className="heading__tetariary">Top news</h3>
+			<h3 className="heading__tetariary">Top Posts</h3>
 			<div className="news__cards">
         {isLoading ? <Spinner /> : <News posts={truncatedPostsFunc(posts)} />}
         <div className="ads__box--big">&nbsp;</div>
