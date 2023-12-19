@@ -39,6 +39,7 @@ import BlogNavbar from "../../components/Navbar";
 
 /////////////////////////////////////////////////////////
 import Alert from '../../components/Alert';
+import { dateConverter } from '../../utils/helper';
 
 
 const BlogDetails = () => {
@@ -56,7 +57,7 @@ const BlogDetails = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const [isShared, setIsShared] = useState(false);
-  const [likes, setLikes] = useState(post.likesCount || 0);
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -71,9 +72,31 @@ const BlogDetails = () => {
   /////////////////////////////////////////////////////////////
   const [showAlert, setShowAlert] = useState(false);
   const [message, setMessage] = useState('');
+  // const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [followerStatus, setFollowerStatus] = useState('');
+  const [postCreator, setpostCreator] = useState(null);
 
 
-  console.log(post)
+  function handleReset() {
+    setIsError(false);
+    setMessage('')
+    setIsSuccess(false);
+    setMessage();
+  }
+
+  // HANDLE ON FETCH FAILURE
+  function handleFailure(mess) {
+    setIsError(true);
+    setMessage(mess)
+    setTimeout(() => {
+        setIsError(false);
+        setMessage('')
+    }, 2000);
+  }
+
+
 
   const USER_URL = `${HOST_URL()}/users/${id}`;
   const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`;
@@ -118,6 +141,7 @@ const BlogDetails = () => {
         // setPosts(response.data);
         console.log(response);
         setCreator(response.data.data.user);
+        console.log(response.data.data.user);
         setCreatorSlug(response.data.data.user.slug);
         const listallrequest = response.data.data.user.followerRequestsReceived;
         const userid = user._id;
@@ -150,27 +174,134 @@ const BlogDetails = () => {
     }
   };
 
-  console.log(creatorslug);
+  console.log(post.creator)
 
   // FOLLOW A USER
-  const handleFollowClick = async () => {
+  async function handleFollow() {
     try {
-      // const response = await axios.post(FOLLOW_USER_URL, null, {
-      const response = await axios.get(FOLLOW_USER_URL, { headers });
-      console.log(headers);
-      // Adjust the API endpoint as needed
-      if (response.status === 200) {
-        setIsFollowing(true);
 
-        // Store the isFollowing state in localStorage
-        localStorage.setItem("isFollowing", JSON.stringify(true));
+      handleReset();
+      const res = await fetch(`http://localhost:3005/api/users/${post.creator._id}/request-follow`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
       }
-    } catch (error) {
-      console.error("Error following user:", error.data);
+      console.log(data);
+      
+
+    } catch (err) {
+      handleFailure(err.message)
     }
   };
 
+  
+  //////////////////////////////////////////////////////////
+  useEffect(() => {
+    async function fetchCurrPost() {
+      try {
+        const res = await fetch(`http://localhost:3005/api/blogs/${post._id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": 'application/json',
+          }
+        });
+        const data = await res.json();
+        if(data.data.blog.likes.includes(user._id)) {
+          setLiked(true)
+        }
+        setLikes(data.data.blog.likes.length || 0)
+        console.log(data)
+      } catch(err) {
+        console.error(err.message)
+      }
+    }
+    fetchCurrPost()
+  }, [post]);
 
+
+  useEffect(() => {
+    async function fetchCreator() {
+      try {
+        const res = await fetch(`http://localhost:3005/api/users/${post.creator._id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') {
+          throw new Error(data.message);
+        }
+        const creator = data.data.user;
+        if(creator.followerRequestsReceived.includes(user._id)) {
+          setFollowerStatus('request sent');
+        }
+        if(creator.followerRequestsSent.includes(user._id)) {
+          setFollowerStatus('follow back');
+        }
+        if(creator.following.includes(user._id)) {
+          setFollowerStatus('following')
+        }
+        if(creator.followers.includes(user._id)) {
+          setFollowerStatus('follower')
+        }
+        setpostCreator(creator);
+      } catch(err) {
+        console.log(err)
+      }
+    }
+    fetchCreator();
+  }, [post]);
+
+  console.log(followerStatus);
+
+  
+  const toggleLike = async () => {
+    setLiked(!liked);
+
+
+    try {
+      if (liked) {
+        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+        setLikes(prev => prev - 1);
+      } else {
+        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+        setLikes(prev => prev + 1);
+      }
+
+    } catch(err) {
+      console.error(err.message)
+    }
+  };
+
+  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
 
 
   function copyInput() {
@@ -182,6 +313,7 @@ const BlogDetails = () => {
       setMessage('')
     }, 2000);
   }
+
   ///////////////////////////////////////////////////////
 
 
@@ -298,9 +430,6 @@ const BlogDetails = () => {
     }
   };
 
-  console.log(relatedBlogs);
-  console.log(post.creator?.image);
-
   useEffect(() => {
     fetchRelatedBlogs();
   }, []);
@@ -351,22 +480,21 @@ const BlogDetails = () => {
                               </p>
                             </Link>
                             <p className="blog__info">
-                              7 min &nbsp;
+                              {/* 7 min &nbsp;
                               {new Date(post.date).toLocaleString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
-                              })}
+                              })} */}
+                              {dateConverter(post.createdAt)}
                             </p>
                           </div>
                         </div>
                       </div>
                       <button
-                        onClick={handleFollowClick}
-                        className="mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                      >
-                        {/* <button className="w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78"> */}
-                        {isFollowing ? "Unfollow" : "Follow"}
+                        onClick={followerStatus === null && handleFollow}
+                        className={`mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${followerStatus === 'request sent' ? 'request-sent' : ''} `}>
+                        {followerStatus === 'request sent' ? 'Request Sent!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
                       </button>
                     </div>
                     <div className="img__and__details__2">
@@ -386,8 +514,9 @@ const BlogDetails = () => {
                               onClick={toggleLike}
                             />
                           )}
+                          
                           {/* <span className="">{likes} likes</span> */}
-                          <span className="">{likes}</span>
+                          <span className="">{likes} Like{likes !== 1 ? 's' : ''}</span>
                         </div>
                         <div className="reaction">
                           {/* Render the comment icon and attach a click handler */}
@@ -532,8 +661,10 @@ const BlogDetails = () => {
                         </ul>
                       </div>
                       <div>
-                        <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
-                          Follow
+                        <button 
+                          onClick={followerStatus === null && handleFollow}
+                          className={`mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78 ${followerStatus === 'request sent' ? 'request-sent' : ''} `}>
+                          {followerStatus === 'request sent' ? 'Request Sent!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
                         </button>
                       </div>
                     </div>
@@ -586,7 +717,11 @@ const BlogDetails = () => {
                         dangerouslySetInnerHTML={{ __html: post?.content }}
                       ></div>
 
-                      <ArticleSocialInfo avatarImg={AvatarImg} />
+                      <ArticleSocialInfo 
+                        avatarImg={AvatarImg}
+                        postId={post._id}
+                        totalLikes={post.likesCounts}
+                      />
                     </div>
                   </div>
                 ))}

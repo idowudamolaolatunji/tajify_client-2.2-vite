@@ -69,13 +69,15 @@ function ArticleSocialInfo({
       }
     }
     fetchCurrPost()
-  }, [likes])
+  }, [])
 
   
   const toggleLike = async () => {
+    // Toggle liked state
+    setLiked(!liked);
+
     try {
       if (liked) {
-        setLikes(likes - 1);
         const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${postId}`, {
           method: 'PATCH',
           headers: {
@@ -86,9 +88,8 @@ function ArticleSocialInfo({
         if(!res.ok) throw new Error('Something went wrong!');
         const data = await res.json();
         if(data.status !== 'success') throw new Error(data.message);
-  
+        setLikes(prevLikes => prevLikes - 1);
       } else {
-        setLikes(likes + 1);
         const res = await fetch(`http://localhost:3005/api/blogs/like-post/${postId}`, {
           method: 'PATCH',
           headers: {
@@ -99,10 +100,11 @@ function ArticleSocialInfo({
         if(!res.ok) throw new Error('Something went wrong!');
         const data = await res.json();
         if(data.status !== 'success') throw new Error(data.message);
+        setLikes(prevLikes => prevLikes + 1);
       }
   
       // Toggle liked state
-      setLiked(!liked);
+      // setLiked(!liked);
 
     } catch(err) {
       console.error(err.message)
@@ -138,7 +140,7 @@ function ArticleSocialInfo({
         ) : (
           <AiOutlineHeart onClick={toggleLike} />
         )}
-        <p className="article__social--figure">{likes === 0 ? '' : likes} likes</p>
+        <p className="article__social--figure">{likes === 0 ? 'No' : likes} like{likes !== 1 ? 's' : ''}</p>
       </div>
       <Link to={`/details/${postId}?commentBar=true`}>
         <div className="social--info">
