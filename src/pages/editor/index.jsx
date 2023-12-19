@@ -1,11 +1,13 @@
-
-
 import React, { useState } from "react";
 import "../../pages/blogDetails/blogDetails.css";
 import axios from "axios";
-import CKEditor from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+// import CKEditor from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useAuthContext } from "../../context/AuthContext";
+import { EditorState, convertToRaw, convertFromRaw } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import draftToHtml from "draftjs-to-html";
 import { toast } from "react-toastify";
 import { Textarea, FormControl, FormLabel } from "@chakra-ui/react";
 // import Loader from "../../components/Loader";
@@ -30,6 +32,16 @@ const EditorPage = () => {
 
   const handleEditorChange = (content, editor) => {
     console.log("Content was updated:", content);
+  };
+
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
+
+  const updateTextDescription = async (state) => {
+    await setEditorState(state);
+
+    const data = convertToRaw(editorState.getCurrentContent());
   };
 
   const handleImage = async (e) => {
@@ -70,7 +82,10 @@ const EditorPage = () => {
         // `${HOST_URL()}/blogs`,
         JSON.stringify({
           title: title,
-          content: text,
+          content: JSON.stringify(
+            draftToHtml(convertToRaw(editorState.getCurrentContent()))
+          ),
+          // content: text,
           category: category,
           subscriptionFee: subscriptionFee,
           isPremium: isPremium,
@@ -107,6 +122,15 @@ const EditorPage = () => {
       setLoading(false);
     }
   };
+
+  // formdata.append(
+  //   "content",
+  //   JSON.stringify(convertToRaw(editorState.getCurrentContent()))
+  // );
+  // formdata.append(
+  //   "html",
+  //   JSON.stringify(draftToHtml(convertToRaw(editorState.getCurrentContent())))
+  // );
 
   console.log(image);
 
@@ -181,7 +205,7 @@ const EditorPage = () => {
               </div>
             </div>
           </div>
-{/* 
+          {/* 
           <CKEditor
             editor={ClassicEditor}
             data={text}
@@ -194,7 +218,19 @@ const EditorPage = () => {
               setText(data);
             }}
           /> */}
-        
+
+          <div className="mb-4 px-4">
+            <p className="fat mb-3 text-white">Content</p>
+            <div className="w-[700px] border-2 ">
+              <Editor
+                editorState={editorState}
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="wrapperClassName"
+                editorClassName="editorClassName"
+                onEditorStateChange={updateTextDescription}
+              />
+            </div>
+          </div>
 
           <FormControl id="category" className="mt-6">
             <select

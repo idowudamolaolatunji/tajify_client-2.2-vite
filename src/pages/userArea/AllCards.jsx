@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 // import { truncateString, calculateDiscount } from "../../utils/Helpers";
 import Currency from "react-currency-formatter";
 import { Link } from "react-router-dom";
-import { useDataContext } from "../../context/DataContext";
 import { toast } from "react-toastify";
 import { useDisclosure } from "@chakra-ui/react";
 import Swal from "sweetalert2";
@@ -12,28 +11,19 @@ import { HOST_URL } from "../../assets/js/help_func";
 
 const MySwal = withReactContent(Swal);
 
-const AllCards = ({ myProducts, myProductsId }) => {
+const AllCards = ({ blog, myProductsId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { nairaToTajiEquivalent, deleteRequest, getRequest } = useDataContext();
   const [singleProduct, setSingleProduct] = useState(null);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   //   Get the product id from the prop that was recieved
-  const id = myProductsId;
+  // const id = myProductsId;
 
-  const getOneProduct = async () => {
-    const result = await getRequest("/myBlogs");
-    if (result) {
-      setSingleProduct(result);
-      console.log(result);
-    } else {
-      toast.error("Oops, Check your network connection!");
-    }
-  };
+
 
   // console.log(singleProduct?.message._id);
-  console.log(myProductsId);
+  // console.log(myProductsId);
 
   //   Function to delete a product
   const handleDelete = async () => {
@@ -96,45 +86,45 @@ const AllCards = ({ myProducts, myProductsId }) => {
   return (
     <>
       <div className="flex flex-col gap-[6px]">
-        <Link
+        {/* <Link
           to={
-            myProducts?.type == "simple"
-              ? `/products/${myProducts?.slug}`
-              : `/v-products/${myProducts._id}`
+            blogtype == "simple"
+              ? `/products/${blogIdslug}`
+              : `/v-products/${blogIdid}`
           }
-        >
+        > */}
           <div className="flex flex-col items-start py-[13px] px-[10px] gap-[6px] isolate relative w-[154px] max-sm:w-[130px] bg-white rounded-[10px] my-2 transition-all hover:shadow-lg hover:-translate-y-1">
             <img
-              src={myProducts.image}
+              src={blog.image}
               alt=""
               className="w-[130px] h-[130px] max-sm:w-[80px]  max-sm:h-[80px] object-cover"
             />
             <div className="product-txt-div flex flex-col gap-[6px]">
               <p className="text-sm max-sm:text-xs h-[40px]">
-                {truncateString(myProducts?.name, 25)}
+                {truncateString(blog.name, 25)}
               </p>
               <p className="font-bold text-base max-sm:text-sm">
-                <Currency quantity={myProducts?.price} currency="NGN" />
+                <Currency quantity={blog.price} currency="NGN" />
               </p>
               <p className=" text-xs line-through font-light">
-                <Currency quantity={myProducts?.slashed_price} currency="NGN" />
+                <Currency quantity={blog.slashed_price} currency="NGN" />
               </p>
 
               <p className=" text-green-600 text-sm max-sm:text-xs font-semibold">
-                TAJI {nairaToTajiEquivalent(myProducts?.price)}
+                TAJI {nairaToTajiEquivalent(blog)}
               </p>
             </div>
             <div className="discount absolute w-[18px] h-[17px] top-[3px] right-[3px] bg-primary flex justify-center items-center rounded-full p-6 max-sm:p-4">
               <p className="text-white text-sm max-sm:text-xs">
                 {calculateDiscount(
-                  myProducts?.price,
-                  myProducts?.slashed_price
+                  blogprice,
+                  blogIdslashed_price
                 )}
                 %
               </p>
             </div>
           </div>
-        </Link>
+        {/* </Link> */}
 
         <div className="flex justify-between w-[157px]">
           <button
@@ -144,7 +134,7 @@ const AllCards = ({ myProducts, myProductsId }) => {
             Edit
           </button>
           <button
-            onClick={() => handleDelete(myProductsId)}
+            // onClick={() => handleDelete(blogId)}
             disabled={loading}
             className=" bg-[#008001] py-4 px-4 h-[30px] text-sm rounded-md font-semibold text-white flex items-center gap-2"
           >

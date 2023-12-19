@@ -50,7 +50,7 @@ const PaymentPage = () => {
       if (result.isConfirmed) {
         // User confirmed, proceed with deletion
         const response = await axios.post(
-          `${HOST_URL()}/market/checkout/taji/${singleBlogId}`,
+          `${HOST_URL()}/blogs/checkout-blogs/taji/${singleBlogId}`,
           JSON.stringify({
             amount: singleBlogPrice,
           }),

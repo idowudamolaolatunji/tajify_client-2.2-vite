@@ -376,14 +376,14 @@ const BlogDetails = () => {
                         <div className="reaction">
                           {liked ? (
                             <AiFillHeart
-                              onClick={toggleLike}
+                              // onClick={toggleLike}
                               className="writer__icons post--like"
                             />
                           ) : (
                             <AiOutlineHeart
                               className="writer__icons"
                               style={{ color: "#F06" }}
-                              onClick={toggleLike}
+                              // onClick={toggleLike}
                             />
                           )}
                           {/* <span className="">{likes} likes</span> */}
@@ -446,12 +446,17 @@ const BlogDetails = () => {
               <div className="paragraph__container">
                 <div className="">
                   {premium ? (
+                    // <p>
+                    //   {truncatedContent}
+                    // </p>
                     <p
                       className="details__paragraph "
-                      dangerouslySetInnerHTML={{ __html: truncatedContent }}
+                      dangerouslySetInnerHTML={{ __html: JSON.parse(truncatedContent) }}
                     />
                   ) : (
-                    <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                    // <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                    <p dangerouslySetInnerHTML={{ __html: JSON.parse(post?.content) }} />
+                    // <p>{post?.content}</p>
                   )}
                   {premium && (
                     <div className="subscription__fee flex items-center justify-evenly">
