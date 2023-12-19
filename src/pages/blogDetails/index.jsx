@@ -75,12 +75,9 @@ const BlogDetails = () => {
 
   console.log(post)
 
-  // const SINGLE_BLOGS_URL = `http://localhost:3005/api/blogs/${id}`;
-  const USER_URL = `${HOST_URL()}/users/${id}`; // Replace with your actual API endpoint
-  // const USER_URL = `https://api.tajify.com/api/users/username/${id}`; // Replace with your actual API endpoint
-  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`; // Replace with your actual API endpoint
-  // const FOLLOW_USER_URL = "https://api.tajify.com/api/users/65158a3db5daafe0fef241b3/request-follow"; // Replace with your actual API
-  const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`; // Updated API URL
+  const USER_URL = `${HOST_URL()}/users/${id}`;
+  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`;
+  const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`;
 
   console.log(id);
   console.log(userId);
@@ -173,67 +170,7 @@ const BlogDetails = () => {
     }
   };
 
-  
-  //////////////////////////////////////////////////////////
-  useEffect(() => {
-    async function fetchCurrPost() {
-      try {
-        const res = await fetch(`https://test.tajify.com/api/blogs/${post._id}`, {
-          method: 'GET',
-          headers: {
-            "Content-Type": 'application/json',
-          }
-        });
-        const data = await res.json();
-        if(data.data.blog.likes.includes(user._id)) {
-          setLiked(true)
-        }
-      } catch(err) {
-        console.error(err.message)
-      }
-    }
-    fetchCurrPost()
-  }, [likes])
 
-  
-  const toggleLike = async () => {
-    try {
-      if (liked) {
-        setLikes(likes - 1);
-        const res = await fetch(`https://test.tajify.com/api/blogs/unlike-post/${post._id}`, {
-          method: 'PATCH',
-          headers: {
-            "Content-Type": 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if(!res.ok) throw new Error('Something went wrong!');
-        const data = await res.json();
-        if(data.status !== 'success') throw new Error(data.message);
-  
-      } else {
-        setLikes(likes + 1);
-        const res = await fetch(`https://test.tajify.com/api/blogs/like-post/${post._id}`, {
-          method: 'PATCH',
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if(!res.ok) throw new Error('Something went wrong!');
-        const data = await res.json();
-        if(data.status !== 'success') throw new Error(data.message);
-      }
-  
-      // Toggle liked state
-      setLiked(!liked);
-
-    } catch(err) {
-      console.error(err.message)
-    }
-  };
-
-  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
 
 
   function copyInput() {
