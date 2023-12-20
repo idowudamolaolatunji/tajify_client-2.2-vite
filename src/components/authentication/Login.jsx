@@ -185,7 +185,7 @@ const Login = () => {
     </section>
 
         
-    <Alert alertType={`${isSuccess ? "success" : isError ? "error" : ""}`}>
+      <Alert alertType={`${isSuccess ? "success" : isError ? "error" : ""}`}>
 				{isSuccess ? (
 					<AiFillCheckCircle className="alert--icon" />
 				) : isError ? (

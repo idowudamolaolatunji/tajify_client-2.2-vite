@@ -16,11 +16,21 @@ import DropdownMenu from "./DropdownMenu";
 import { HOST_URL } from "../assets/js/help_func";
 import axios from "axios";
 
+import HeaderSearchModal from '../components/HeaderSearchModal';
+import Notification from "./Notification";
+
+
 const GET_USER_OBJ_URL = `${HOST_URL()}/users/getMyObj`;
 
 function MainGreenHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const [isShowMobileMenu, setIsShowMobileMenu] = useState(false)
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [results, setResults] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const location = useLocation();
   
@@ -29,12 +39,64 @@ function MainGreenHeader() {
   const [userImage, setUserImage] = useState();
 
 
-  const toggleDropdown = () => {
+  function toggleNotification() {
+    setIsNotificationOpen(!isNotificationOpen);
+  };
+  function toggleDropdown() {
     setIsDropdownOpen(!isDropdownOpen);
   };
-  const toggleMobileMenu = () => {
+  function toggleMobileMenu() {
 		setIsShowMobileMenu(!isShowMobileMenu);
 	};
+
+  useEffect(function() {
+    const controller = new AbortController();
+    
+    async function fetchSearch() {
+      try {
+        // const query = String(searchQuery).toLowerCase();
+        console.log(searchQuery)
+        if (searchQuery.trim() === '' || !setSearchQuery) {
+          setShowSearchModal(false)
+          setResults({});
+          return;
+        }
+
+        setMessage('');
+        setIsLoading(true);
+        setShowSearchModal(true);
+
+        const res = await fetch(`http://api.tajify.com/api/search?query=${searchQuery}`
+        , {
+          signal: controller.signal ,
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        setIsLoading(true)
+        const data = await res.json();
+        console.log(res, data);
+        setShowSearchModal(true);
+        setResults(data.data.results)
+  
+      } catch(err) {
+        if (err.name !== "AbortError") {
+          setMessage(err.message)
+          setShowSearchModal(false)
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSearch();
+
+    return function () {
+      controller.abort();
+    };
+
+  }, [searchQuery]);
 
 
   const getCurrentUserUpdatedObj = async (id) => {
@@ -46,7 +108,6 @@ function MainGreenHeader() {
       });
 
       if (userObj.data.data.user?.image) {
-        console.log(userObj.data.data.user?.image);
         setUserImage(userObj.data.data.user?.image);
       } else {
         console.error("Error fetching user object");
@@ -89,8 +150,8 @@ function MainGreenHeader() {
         </span>
 
         <span className="header__input">
-          <input type="search" placeholder="Search..." />
-          <AiOutlineSearch className="header__input-icon" />
+          <input type="search" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          {!searchQuery && <AiOutlineSearch className="header__input-icon" />}
         </span>
 
         <nav className="main-navbar">
@@ -138,7 +199,7 @@ function MainGreenHeader() {
           <div className="navbar--others">
             {!user ? (
               <>
-                <Link to="/coming-soon" className=" nav__button creator ">
+                <Link to="/signup" className=" nav__button creator ">
                   Become a Creator
                 </Link>
 
@@ -152,7 +213,11 @@ function MainGreenHeader() {
               </>
             ) : (
               <>
-                <BsFillBellFill className="navbar--others-icon" />
+                {/* <BsFillBellFill className="navbar--others-icon" style={ isNotificationOpen && { color: '#ff0066' }} onClick={toggleNotification} />
+                {isNotificationOpen && (
+                  <Notification toggleNotification={toggleNotification} />
+                )} */}
+                
                 <span className="navbar--profile">
                   <img
                     className="navbar--profile-img"
@@ -166,7 +231,7 @@ function MainGreenHeader() {
 
                   {isDropdownOpen ?  <BsChevronUp style={{color: "#ff0066"}} onClick={toggleDropdown} /> : <BsChevronDown onClick={toggleDropdown} />}
                   {isDropdownOpen && (
-                  <DropdownMenu toggleDropdown={toggleDropdown} />
+                    <DropdownMenu toggleDropdown={toggleDropdown} />
                   )}
                 </span>
               </>
@@ -272,6 +337,9 @@ function MainGreenHeader() {
           }
 				</nav>
 			</header>
+
+
+      {showSearchModal && <HeaderSearchModal showSearchModal={showSearchModal} setShowSearchModal={setShowSearchModal} isLoading={isLoading} message={message} results={results} />}
 
     </>
   );

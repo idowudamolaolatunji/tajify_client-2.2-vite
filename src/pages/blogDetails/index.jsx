@@ -38,7 +38,9 @@ import Premium from "../../components/Premium";
 import BlogNavbar from "../../components/Navbar";
 
 /////////////////////////////////////////////////////////
-import Alert from "../../components/Alert";
+import Alert from '../../components/Alert';
+import { dateConverter, formatLikes } from '../../utils/helper';
+
 
 const BlogDetails = () => {
   const { user, token } = useAuthContext();
@@ -57,7 +59,7 @@ const BlogDetails = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const [isShared, setIsShared] = useState(false);
-  const [likes, setLikes] = useState(post.likesCount || 0);
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -73,10 +75,32 @@ const BlogDetails = () => {
 
   /////////////////////////////////////////////////////////////
   const [showAlert, setShowAlert] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [followerStatus, setFollowerStatus] = useState('');
+  const [postCreator, setpostCreator] = useState(null);
+
+  // MY RESET HANDLER FUNCTION
+  function handleReset() {
+    setIsError(false);
+    setMessage('')
+    setIsSuccess(false);
+    setMessage();
+  }
+  // HANDLE ON FAILURE
+  function handleFailure(mess) {
+    setIsError(true);
+    setMessage(mess)
+    setTimeout(() => {
+        setIsError(false);
+        setMessage('')
+    }, 2000);
+  }
+  ////////////////////////////////////////////////////////////
+
 
   const USER_URL = `${HOST_URL()}/users/${id}`;
-  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`;
   const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`;
   const GET_USER_OBJ_URL = `${HOST_URL()}/users/getMyObj`;
   const SINGLE_BLOGS_URL = `${HOST_URL()}/blogs/${id}`;
@@ -129,7 +153,6 @@ const BlogDetails = () => {
   };
 
   // FUNCTION TO SHARE POST
-
   const handleShare = async () => {
     try {
       const response = await axios.post(SHARE_BLOGS_URL, {
@@ -156,6 +179,7 @@ const BlogDetails = () => {
         // setPosts(response.data);
         console.log(response);
         setCreator(response.data.data.user);
+        console.log(response.data.data.user);
         setCreatorSlug(response.data.data.user.slug);
         const listallrequest = response.data.data.user.followerRequestsReceived;
         const userid = user._id;
@@ -188,24 +212,196 @@ const BlogDetails = () => {
     }
   };
 
-  // FOLLOW A USER
-  const handleFollowClick = async () => {
-    try {
-      // const response = await axios.post(FOLLOW_USER_URL, null, {
-      const response = await axios.get(FOLLOW_USER_URL, { headers });
-      console.log(headers);
-      // Adjust the API endpoint as needed
-      if (response.status === 200) {
-        setIsFollowing(true);
-
-        // Store the isFollowing state in localStorage
-        localStorage.setItem("isFollowing", JSON.stringify(true));
+  
+  //////////////////////////////////////////////////////////
+  useEffect(() => {
+    async function fetchCurrPost() {
+      try {
+        const res = await fetch(`https://api.tajify.com/api/blogs/${post._id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": 'application/json',
+          }
+        });
+        const data = await res.json();
+        if(data.data.blog.likes.includes(user._id)) {
+          setLiked(true)
+        }
+        setLikes(data.data.blog.likes.length || 0)
+        console.log(data)
+      } catch(err) {
+        console.error(err.message)
       }
-    } catch (error) {
-      console.error("Error following user:", error.data);
+    }
+    fetchCurrPost()
+  }, [post]);
+
+  // 
+  useEffect(() => {
+    async function fetchCreator() {
+      try {
+        const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') {
+          throw new Error(data.message);
+        }
+        const creator = data.data.user;
+        if(creator.followerRequestsReceived.includes(user._id)) {
+          setFollowerStatus('request sent');
+        } else if(creator.followerRequestsSent.includes(user._id)) {
+          setFollowerStatus('follow back');
+        } else if(creator.following.includes(user._id)) {
+          setFollowerStatus('following')
+        }else if(creator.followers.includes(user._id)) {
+          setFollowerStatus('follower')
+        } else {
+          setFollowerStatus(null)
+        }
+        setpostCreator(creator);
+      } catch(err) {
+        console.log(err)
+      }
+    }
+    fetchCreator();
+  }, [post, followerStatus]);
+
+  // FOLLOW A USER
+  async function handleFollow() {
+    try {
+
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/request-follow`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus('request sent');
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch (err) {
+      handleFailure(err.message)
     }
   };
 
+  // CANCEL A FOLLOW REQUEST
+  async function handleCancelFollow() {
+    try {
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/cancle-follow-request`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus(null)
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch(err) {
+      handleFailure(err.message)
+    }
+  }
+
+  // UNFOLLOW A USER
+  async function handleCancelFollow() {
+    try {
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/cancle-follow-request`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus(null)
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch(err) {
+      handleFailure(err.message)
+    }
+  }
+
+  /*
+  router.post("/accept-follow/:id", authController.protected, userController.acceptFollowRequest);
+  router.post("/reject-follow/:id", authController.protected, userController.rejectFollowRequest);
+  router.post("/:id/unfollow", authController.protected, userController.unFollowUser);
+  */
+  
+  const toggleLike = async () => {
+    setLiked(!liked);
+
+    try {
+      if (liked) {
+        const res = await fetch(`https://api.tajify.com/api/blogs/unlike-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+        setLikes(prev => prev - 1);
+      } else {
+        const res = await fetch(`https://api.tajify.com/api/blogs/like-post/${post._id}`, {
+          method: 'PATCH',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(!res.ok) throw new Error('Something went wrong!');
+        const data = await res.json();
+        if(data.status !== 'success') throw new Error(data.message);
+        setLikes(prev => prev + 1);
+      }
+
+    } catch(err) {
+      console.error(err.message)
+    }
+  };
+
+  const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
   function copyInput() {
     navigator.clipboard.writeText(`https://${referralUrlWithWWW}`);
     setShowAlert(true);
@@ -215,6 +411,7 @@ const BlogDetails = () => {
       setMessage("");
     }, 2000);
   }
+
   ///////////////////////////////////////////////////////
 
   const toggleDropdown = () => {
@@ -284,7 +481,6 @@ const BlogDetails = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [id, token]);
 
@@ -316,7 +512,6 @@ const BlogDetails = () => {
             ...post,
             content: truncateText(post.content, 60),
           }));
-        // setBlogsCategory(response.data.data.blogs);
         setRelatedBlogs(truncatedPosts);
       } else {
         console.error("Error fetching posts");
@@ -335,39 +530,108 @@ const BlogDetails = () => {
     fetchData();
   }, [id, user, userId, token]);
 
-  {
+
     return (
       <>
         <div className="blog__container">
           <BlogNavbar />
 
-          {loading ? (
-            <div className="loader__container">
-              <LoaderSpiner />
-            </div>
-          ) : post ? ( // Check if post is not null before rendering
-            <div key={post._id} className="blog__content">
-              <div className="content__container">
-                {/* <div className="ads__body">
+        {loading ? (
+          <div className="loader__container">
+            <LoaderSpiner />
+          </div>
+        ) : post ? ( 
+          <div key={post._id} className="blog__content">
+            <div className="content__container">
+              {/* <div className="ads__body">
               <div className="ads__second">
                 <AdsSecond />
               </div>
             </div> */}
                 <div className="ads__box--big width-100">&nbsp;</div>
 
-                <div className="writers__stats">
-                  <div className="writers__stats__container">
-                    <div className="img__and__details__container">
-                      <h1 className="blog__title">{post.title}</h1>
-                      <div className="img__and__details">
-                        <div>
-                          <div className="profile__comments">
-                            <div className="profile__photo">
-                              {/* <img src={creator.image} alt="Profile" className="" /> */}
-                              <img
-                                src={post.creator?.image}
-                                alt="creator's image"
-                                className=""
+              <div className="writers__stats">
+                <div className="writers__stats__container">
+                  <div className="img__and__details__container">
+                    <h1 className="blog__title">{post.title}</h1>
+                    <div className="img__and__details">
+                      <div>
+                        <div className="profile__comments">
+                          <div className="profile__photo">
+                            <img
+                              src={post.creator?.image}
+                              alt="creator's image"
+                              className=""
+                            />
+                          </div>
+                          <div>
+                            <Link to={`/${post.author}/blogs`}>
+                              <p className="blog__author font-bold text-[#F06]">
+                                {post.author}
+                              </p>
+                            </Link>
+                            <p className="blog__info">
+                              
+                              {dateConverter(post.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={followerStatus === null ? handleFollow : followerStatus === 'request sent' ? handleCancelFollow : ''}
+                        className={`mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 `}>
+                        {followerStatus === 'request sent' ? 'Cancel Request!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
+                      </button>
+                    </div>
+                    <div className="img__and__details__2">
+                      <div className="blog__metrics">
+                        <div className="reaction">
+                          {liked ? (
+                            <AiFillHeart
+                              onClick={toggleLike}
+                              className="writer__icons post--like"
+                            />
+                          ) : (
+                            <AiOutlineHeart
+                              className="writer__icons"
+                              style={{ color: "#F06" }}
+                              onClick={toggleLike}
+                            />
+                          )}
+                          
+                          <span className="">{formatLikes(likes)}</span>
+                        </div>
+                        <div className="reaction">
+                          {/* Render the comment icon and attach a click handler */}
+                          <div onClick={toggleDropdown} className="reaction">
+                            <AiOutlineComment
+                              className="writer__icons"
+                              style={{ color: "#F06" }}
+                              onClick={toggleDropdown}
+                            />
+
+                            {/* Render the comment count */}
+
+                            <span>2</span>
+                          </div>
+                        </div>
+                        <div className="reaction">
+                          <div className="reaction">
+                            <IoShareOutline
+                              className="writer__icons"
+                              style={{ color: "#F06" }}
+                              onClick={handleShare}
+                            />
+                            {isShared && <p>Post shared successfully!</p>}
+                          </div>
+                        </div>
+                        {premium && (
+                          <div className="premium">
+                            <Premium />
+                            <div className="subscription__fee">
+                              <Currency
+                                quantity={post.subscriptionFee}
+                                currency="NGN"
                               />
                             </div>
                             <div>
@@ -385,14 +649,12 @@ const BlogDetails = () => {
                                 })}
                               </p>
                             </div>
-                          </div>
+                          </div>)}
                         </div>
-                        <button
-                          onClick={handleFollowClick}
-                          className="mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                        >
-                          {/* <button className="w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78"> */}
-                          {isFollowing ? "Unfollow" : "Follow"}
+                        <button 
+                          onClick={followerStatus === null ? handleFollow : followerStatus === 'request sent' ? handleCancelFollow : ''}
+                          className={`mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78 `}>
+                          {followerStatus === 'request sent' ? 'Cancel Request!' : followerStatus === 'follow back' ? 'Follow Request' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
                         </button>
                       </div>
                       <div className="img__and__details__2">
@@ -549,43 +811,17 @@ const BlogDetails = () => {
                           className="profile__img"
                         />
                       </div>
-                    </div>
-                    <div className="writers__container">
-                      <div className="profile__socials">
-                        <div className="profile__socials__1">
-                          <h3 className="font-bold text-[#F06]">
-                            {post.author}
-                          </h3>
-                          <ul className="socials__icons">
-                            <li>
-                              <a href="#" className="social__icon--link">
-                                <AiOutlineInstagram />
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#" className="social__icon--link">
-                                <AiFillFacebook />
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#" className="social__icon--link">
-                                <AiFillTwitterSquare />
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#" className="social__icon--link">
-                                <BsPinterest />
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                        <div>
-                          <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
-                            Follow
-                          </button>
-                        </div>
-                      </div>
-                      <p>{post.creator?.bio}</p>
+                      <h3 className="article__heading">{post?.title}</h3>
+                      <div
+                        className="article__text"
+                        dangerouslySetInnerHTML={{ __html: post?.content }}
+                      ></div>
+
+                      <ArticleSocialInfo 
+                        avatarImg={AvatarImg}
+                        postId={post._id}
+                        totalLikes={post.likesCounts}
+                      />
                     </div>
                   </div>
                 </div>
@@ -647,19 +883,21 @@ const BlogDetails = () => {
           <Footer />
         </div>
 
-        <Alert alertType={`${showAlert && "success"}`}>
-          {showAlert && <AiFillCheckCircle className="alert--icon" />}
-          <p>{message}</p>
-        </Alert>
+
+      <Alert alertType={`${isSuccess || showAlert ? "success" : isError ? "error" : ""}`}>
+				{isSuccess || showAlert ? (
+					<AiFillCheckCircle className="alert--icon" />
+				) : isError ? (
+					<AiFillExclamationCircle className="alert--icon" />
+				) : (
+					""
+				)}
+				<p>{message}</p>
+			</Alert>
+
       </>
     );
-    {
-    }
-  }
+  
 };
 
 export default BlogDetails;
-
-// const BlogDetailsContainer = styled.div`
-
-// `;

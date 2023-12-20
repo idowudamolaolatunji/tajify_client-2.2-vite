@@ -112,7 +112,7 @@ function BlogNavbar() {
             <NavLink to="/writer">
               <li
                 className={`navbar__item ${
-                  location.pathname === "/writer" ? "nav-active" : ""
+                  location.pathname.includes("/writer") || location.pathname.includes('details')  ? "nav-active" : ""
                 }`}
               >
                 <PiNotePencilFill className="navbar--icon" />
@@ -161,7 +161,7 @@ function BlogNavbar() {
           <div className="navbar--others">
             {!user ? (
               <>
-                <Link to="/coming-soon" className=" nav__button creator ">
+                <Link to="/signup" className=" nav__button creator ">
                   Become a Creator
                 </Link>
 
@@ -178,7 +178,7 @@ function BlogNavbar() {
                 <Link to="/blogs/dashboard/create-blog">
                   <SlNote className="navbar--others-icon" />
                 </Link>
-                <BsFillBellFill className="navbar--others-icon" />
+                {/* <BsFillBellFill className="navbar--others-icon" /> */}
                 <span className="navbar--profile">
                   <img
                     className="navbar--profile-img"
@@ -329,7 +329,7 @@ function BlogNavbar() {
               </li>
 
               {!user && (
-                <Link to="/coming-soon">
+                <Link to="/signup">
                   <li className="navbar__item">Become a Creator</li>
                 </Link>
               )}
