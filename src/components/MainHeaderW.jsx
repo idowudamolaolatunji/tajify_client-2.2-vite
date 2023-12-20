@@ -50,9 +50,9 @@ function MainGreenHeader() {
 	};
 
   useEffect(function() {
-    const controller = new AbortController();
+    // const controller = new AbortController();
     
-    async function fetchSearch() {
+    const fetchSearch = setTimeout(async () => {
       try {
         // const query = String(searchQuery).toLowerCase();
         console.log(searchQuery)
@@ -68,7 +68,7 @@ function MainGreenHeader() {
 
         const res = await fetch(`http://api.tajify.com/api/search?query=${searchQuery}`
         , {
-          signal: controller.signal ,
+          // signal: controller.signal ,
           method: 'GET',
           headers: {
             "Content-Type": "application/json",
@@ -89,11 +89,11 @@ function MainGreenHeader() {
       } finally {
         setIsLoading(false);
       }
-    }
-    fetchSearch();
+    }, 350)
 
     return function () {
-      controller.abort();
+      // controller.abort();
+      clearTimeout(fetchSearch)
     };
 
   }, [searchQuery]);

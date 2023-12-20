@@ -36,7 +36,7 @@ function DropdownMenu({}) {
           <BsBarChart />
           <p>Stats</p>
         </li>
-        <Link to="">
+        <Link to="https://tajify.com/wallet">
           <li className="dropdown-item">
             <CiWallet />
 
