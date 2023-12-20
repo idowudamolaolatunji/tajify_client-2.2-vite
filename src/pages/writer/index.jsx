@@ -11,7 +11,7 @@ import "../../index.css";
 import "../../pages/blogHome/main.css";
 import MainHeader from "../../components/MainHeader";
 import TopCreators from "../../components/TopCreators";
-import Navbar from "../../components/Navbar";
+import BlogNavbar from "../../components/Navbar";
 import { Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useAuthContext } from "../../context/AuthContext";
@@ -19,6 +19,8 @@ import axios from "axios";
 import LoaderSpinner from "../../components/LoaderSpinner";
 import { HOST_URL } from "../../assets/js/help_func";
 import CategoryHead from "../Categories/categoriesComponents/CategoryHead";
+import MainHeaderW from "../../components/MainHeaderW";
+
 
 // const All_BLOGS_URL = "https://api.tajify.com/api/blogs"; // Updated API URL
 const All_BLOGS_URL = `${HOST_URL()}/blogs`; // Updated API URL
@@ -27,6 +29,19 @@ const Writer = () => {
   const { token } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
+
+
+    //  Truncate text to either 1000 words or 10 lines
+    const truncateText = (text, maxLength) => {
+      const words = text.split(" ");
+      let truncatedText = words.slice(0, maxLength).join(" ");
+  
+      if (words.length > maxLength) {
+        truncatedText += " ...";
+      }
+  
+      return truncatedText;
+    };
 
 
   // FETCH ALL BLOGS
@@ -44,7 +59,14 @@ const Writer = () => {
         if (response.data.data.blogs) {
           // Handle the fetched data and set it in state
 
-          setPosts(response.data.data.blogs.slice(0, 6));
+          // setPosts(response.data.data.blogs.slice(0, 6));
+          const truncatedPosts = response.data.data.blogs.slice(0, 6)
+          .slice(0, 3)
+          .map((post) => ({
+            ...post,
+            content: truncateText(post.content, 60),
+          }));
+        setPosts(truncatedPosts);
         } else {
           console.error("Error fetching posts");
         }
@@ -68,9 +90,10 @@ const Writer = () => {
     <WriterContainer>
       {/* <div className="index__page"> */}
       <div>
-        <div className="header__style">
+        {/* <div className="header__style">
           <Navbar />
-        </div>
+        </div> */}
+        <BlogNavbar  />
 
         {loading ? (
           <div className="loader__container">

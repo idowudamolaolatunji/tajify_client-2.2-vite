@@ -3,12 +3,23 @@ import { AiOutlineUser } from "react-icons/ai";
 import { VscLibrary } from "react-icons/vsc";
 import { BsBarChart } from "react-icons/bs";
 import { CiWallet } from "react-icons/ci";
-import { RxDashboard } from "react-icons/rx";
 import { Link } from "react-router-dom";
+import { MdOutlineLogout } from "react-icons/md";
+import { useAuthContext } from "../context/AuthContext";
 
 function DropdownMenu({}) {
+  const { logout } = useAuthContext();
+
+  function handleLogout () {
+		logout();
+
+		// logging out
+		setTimeout(() => {
+      window.location.href = '/'
+		}, 1000)
+	}
+
   return (
-    // <div className="outsidemodal"></div>
     <div className="dropdown-menu shadow-2xl">
       <ul className="dropdown-list dropdown-list--top">
         <Link to="/profile">
@@ -25,20 +36,19 @@ function DropdownMenu({}) {
           <BsBarChart />
           <p>Stats</p>
         </li>
-        <Link to="/wallet">
-          <li className="dropdown-item">
-            <RxDashboard />
-
-            <p>Wallet</p>
-          </li>
-        </Link>
-        <Link to="/wallet">
+        <Link to="">
           <li className="dropdown-item">
             <CiWallet />
 
             <p>Wallet</p>
           </li>
         </Link>
+
+        <li className="dropdown-item" onClick={handleLogout}>
+          <MdOutlineLogout  />
+
+          <p>Logout</p>
+        </li>
       </ul>
 
       <ul className="dropdown-list dropdown-list--bottom">

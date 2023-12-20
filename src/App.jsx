@@ -6,9 +6,7 @@ import Login from "./components/authentication/Login";
 import BlogDetails from "./pages/blogDetails";
 import WritersProfile from "./pages/writersProfile";
 import About from "./pages/about";
-import ProtectedRoute, {
-  UnProtectedRoute,
-} from "./components/authentication/ProtectedRoute";
+import ProtectedRoute from "./components/authentication/ProtectedRoute";
 import Help from "./pages/help";
 import Privacy from "./pages/privacy";
 import EditorPage from "./pages/editor";
@@ -16,12 +14,7 @@ import Profile from "./pages/profile";
 import ComingSoon from "./pages/comingSoon/ComingSoon";
 import PremiumContent from "./pages/premium/premiumContent";
 import BlogsCategoryPage from "./components/blogsCategoryPage/BlogsCategoryPage";
-import Wallet from "./pages/wallet/Wallet";
 import Category from "./pages/Categories";
-import StakingUi from "./components/StakingUi";
-import AdminUi from "./components/AdminUi";
-import LiquidityPool from "./components/LiquidityPool";
-import Settings from "./pages/settings";
 import CategoryHead from "./pages/Categories/categoriesComponents/CategoryHead";
 import OtpAuth from "./components/authentication/OtpAuth";
 import Culture from "./pages/Categories/categoriesComponents/Culture";
@@ -34,7 +27,15 @@ import Lifestyle from "./pages/Categories/categoriesComponents/Lifestyle";
 import Sport from "./pages/Categories/categoriesComponents/Sport";
 import Technology from "./pages/Categories/categoriesComponents/Technology";
 import CreatorsProfile from "./pages/creatorsProfile/Index";
+import Settings from "./pages/settings/index";
+import AccountPage from "./pages/userArea/AccountPage";
+import Library from "./pages/userArea/Library";
+import MyOrders from "./pages/userArea/MyOrders";
+import CreateBlog from "./pages/userArea/CreateBlog";
+import PaymentPage from "./pages/blogPayment/PaymentPage";
+import EditBlog from "./pages/editor/EditBlog";
 // import ThankYou from "./pages/thankyou/ThankYou";
+
 
 function App() {
   return (
@@ -42,21 +43,22 @@ function App() {
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route path="/editor" element={<EditorPage />}></Route>
+          <Route path="/edit-blog/:id" element={<EditBlog />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
-
-          {/* <Route path="/admin" element={<AdminUi />}></Route>
           <Route path="/settings" element={<Settings />}></Route>
-          <Route path="/staking" element={<StakingUi />}></Route>
-          <Route path="/lp" element={<LiquidityPool />}></Route> */}
-          
-          {/* wallet */}
-          <Route path="/wallet" element={<Wallet />} />
+         <Route path="/blogs/dashboard" element={<AccountPage/>} />
+         <Route path="/blogs/dashboard/library" element={<Library/>} />
+         {/* <Route path="/blogs/dashboard/library/:slug" element={<LibraryItemDetails/>} /> */}
+         <Route path="/blogs/dashboard/create-blog" element={<CreateBlog/>} />
+
+
+
 
           {/* thank you */}
           {/* <Route path="/thank-you/:ref" element={<ThankYou />} /> */}
         </Route>
-        {/* <Route element={<UnProtectedRoute />}> */}
+        
           <Route path="/:id/blogs" element={<WritersProfile />}></Route>
           {/* THE PUBLIC PROFILE OF A CREATOR */}
           <Route path="/:id" element={<CreatorsProfile />}></Route>
@@ -72,6 +74,8 @@ function App() {
           <Route path="/help" element={<Help />}></Route>
           <Route path="/about" element={<About />}></Route>
           <Route path="/category/:category" element={<Category />}></Route>
+         <Route path="/online-payment" element={<PaymentPage/>} />
+
 
 
           <Route path="/category/health" element={<Health />}></Route>
@@ -85,12 +89,6 @@ function App() {
           <Route path="/category/technology" element={<Technology />}></Route>
 
 
-          {/* Temporary, they're supposed to be protected routes */}
-          <Route path="/admin" element={<AdminUi />}></Route>
-          <Route path="/staking" element={<StakingUi />}></Route>
-          <Route path="/lp" element={<LiquidityPool />}></Route>
-          <Route path="/settings" element={<Settings />}></Route>
-        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );

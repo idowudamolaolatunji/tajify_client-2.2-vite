@@ -18,7 +18,7 @@ function ExploreMore() {
               Explore more on our platform as we bring you different kind of
               services.{" "}
             </p>
-            <ExploreButton>Try tajify</ExploreButton>
+            <ExploreButton><Link to='/signup'>Try tajify</Link></ExploreButton>
           </div>
           <div className="explore-more--figures">
             <NavLink to="/coming-soon">

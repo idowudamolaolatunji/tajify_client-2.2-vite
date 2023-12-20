@@ -36,7 +36,7 @@ function ProfileHeroCreator() {
       formData.append("file", file);
       formData.append(
         "upload_preset",
-        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+        import.meta.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
       );
 
       const cloudinaryResponse = await axios.post(

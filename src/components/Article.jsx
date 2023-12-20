@@ -10,158 +10,136 @@ import Premium from "./Premium";
 // const All_BLOGS_URL = "https://api.tajify.com/api/blogs";
 const All_BLOGS_URL = `${HOST_URL()}/blogs`;
 
-function Article({
-  image,
-  AvatarImg,
-  articleViews,
-  articleLikes,
-  articleComments,
-}) {
-  const { category } = useParams();
-  const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState([]);
+function Article({ image, AvatarImg, articleViews, articleLikes, articleComments }) {
+	const { category } = useParams();
+	const [showComments, setShowComments] = useState(false);
+	const [comments, setComments] = useState([]);
 
-  const [trendingBlogs, setTrendingBlogs] = useState([]);
+	const [trendingBlogs, setTrendingBlogs] = useState([]);
 
-  console.log(category);
+	console.log(category);
 
-  //  Truncate text to either 1000 words or 10 lines
-  const truncateText = (text, maxLength) => {
-    const words = text.split(" ");
-    let truncatedText = words.slice(0, maxLength).join(" ");
+	//  Truncate text to either 1000 words or 10 lines
+	const truncateText = (text, maxLength) => {
+		const words = text.split(" ");
+		let truncatedText = words.slice(0, maxLength).join(" ");
 
-    if (words.length > maxLength) {
-      truncatedText += " ...";
-    }
+		if (words.length > maxLength) {
+			truncatedText += " ...";
+		}
 
-    return truncatedText;
-  };
+		return truncatedText;
+	};
 
-  // useEffect(() => {
 
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get(All_BLOGS_URL, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
+	// BLOG RANDOM SHUFFLE FUNCTION
+	function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+	return array;
+	}
 
-  //       if (response.data.data.blogs) {
-  //         const truncatedPosts = response.data.data.blogs
-  //           .slice(0, 3)
-  //           .map((post) => ({
-  //             ...post,
-  //             content: truncateText(post.content, 60),
-  //           }));
-  //         setPosts(truncatedPosts);
-  //         // setPosts(response.data.data.blogs.slice(0,3));
-  //       } else {
-  //         console.error("Error fetching posts");
-  //       }
+	const fetchTrendingBlogs = async () => {
+		try {
+			const response = await axios.get(All_BLOGS_URL);
 
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   };
+			console.log(response);
+			if (response.data.data.blogs) {
+				const shuffledBlogs = shuffleArray(response.data.data.blogs);
+				const truncatedPosts = shuffledBlogs.slice(0, 3).map((post) => ({
+					...post,
+				content: truncateText(post.content, 60),
+				}));
+				// setBlogsCategory(response.data.data.blogs);
+				setTrendingBlogs(truncatedPosts);
+			} else {
+				console.error("Error fetching posts");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
+	};
 
-  //   fetchData();
-  // }, [token]);
+	console.log(trendingBlogs);
 
-  const fetchTrendingBlogs = async () => {
-    try {
-      const response = await axios.get(All_BLOGS_URL);
+	useEffect(() => {
+		fetchTrendingBlogs();
+	}, []);
 
-      console.log(response);
-      if (response.data.data.blogs) {
-        const truncatedPosts = response.data.data.blogs
-          .slice(0, 3)
-          .map((post) => ({
-            ...post,
-            content: truncateText(post.content, 60),
-          }));
-        // setBlogsCategory(response.data.data.blogs);
-        setTrendingBlogs(truncatedPosts);
-      } else {
-        console.error("Error fetching posts");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+	const toggleComments = () => {
+		setShowComments(!showComments);
+	};
 
-  console.log(trendingBlogs);
+	const addComment = (comment) => {
+		// Simulate adding a new comment on the client side
+		setComments([...comments, comment]);
+	};
 
-  useEffect(() => {
-    fetchTrendingBlogs();
-  }, []);
+	return (
+		<figure className="article__figure">
+			{trendingBlogs.map((post) => (
+				<div key={post._id} className="lifestylee">
+					<Link to={`/details/${post._id}`}>
+						<div className="article__image--box">
+							<img
+								src={post.image}
+								alt={`article on ${image}`}
+								className="article__image"
+							/>
+						</div>
+					</Link>
 
-  const toggleComments = () => {
-    setShowComments(!showComments);
-  };
+					<div className="article__content--box">
+						<div className="article__author-info">
+							<Link to={`/${post.author}/blogs`}>
+								<img
+									src={post.creator?.image}
+									alt="author image"
+									className="article-author__image"
+								/>
+							</Link>
 
-  const addComment = (comment) => {
-    // Simulate adding a new comment on the client side
-    setComments([...comments, comment]);
-  };
+							<span className="author">
+								<Link to={`/${post.author}/blogs`}>
+									<h4 className="article__author">{post.author}</h4>
+								</Link>
 
-  return (
-    <figure className="article__figure">
-      {trendingBlogs.map((post) => (
-        <div key={post._id} className="lifestylee">
-          {/* {posts.map((post) => ( */}
-          <Link to={`/details/${post._id}`}>
-            <div className="article__image--box">
-              <img
-                // src={image}
-                src={post.image}
-                alt={`article on ${image}`}
-                className="article__image"
-              />
-            </div>
-          </Link>
-          <div className="article__content--box">
-            <div className="article__author-info">
-              <img
-                src={post.creator?.image}
-                alt="author image"
-                className="article-author__image"
-              />
-              <span className="author">
-                <Link to={`/${post.author}/blogs`}>
-                  <h4 className="article__author">{post.author}</h4>
-                </Link>
-                <p className="article__time">{post.time}</p>
-              </span>
-              <div className="premium">
+								<p className="article__time">{post.time}</p>
+							</span>
+							<span className="author__others">
+								<div className="premium">
+									<Premium />
+								</div>
+								{/* <HiOutlineDotsVertical
+									style={{ cursor: "pointer" }}
+								/> */}
+              				</span>
+							
+						</div>
 
-              <Premium />
-              </div>
-              <HiOutlineDotsVertical
-                style={{ cursor: "pointer", marginLeft: "auto" }}
-              />
-            </div>
-            <h3 className="article__heading">{post.title}</h3>
-            <div
-              className="article__text"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            >
-              {/* {post.content} */}
-            </div>
+						<Link to={`/details/${post._id}`}>
+							<h3 className="article__heading">{post.title}</h3>
+						</Link>
+						<div
+							className="article__text"
+							dangerouslySetInnerHTML={{ __html: post.content }}
+						>
+							{/* {post.content} */}
+						</div>
 
-            <ArticleSocialInfo
-              avatarImg={AvatarImg}
-              articleComments={articleComments}
-              articleViews={articleViews}
-              articleLikes={articleLikes}
-              postId={post._id}
-            />
-          </div>
-        </div>
-      ))}
-    </figure>
-    
-  );
+						<ArticleSocialInfo
+							avatarImg={AvatarImg}
+							articleComments={articleComments}
+							postId={post._id}
+							totalLikes={post.likesCounts}
+						/>
+					</div>
+				</div>
+			))}
+		</figure>
+	);
 }
 
 export default Article;

@@ -1,3 +1,15 @@
+.spinner-container {
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, .12);
+    z-index: 20000000;
+}
 .spinner {
     width: 1.2rem;
     height: 1.2rem;

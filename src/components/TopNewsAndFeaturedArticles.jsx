@@ -14,49 +14,40 @@ const All_BLOGS_URL = `${HOST_URL()}/blogs`; // Updated API URL
 function TopNewsAndFeaturedArticles() {
 
   const { token } = useAuthContext();
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
 
-   //  Truncate text to either 1000 words or 10 lines
-   const truncateText = (text, maxLength) => {
-    const words = text.split(" ");
-    let truncatedText = words.slice(0, maxLength).join(" ");
-
-    if (words.length > maxLength) {
-      truncatedText += " ...";
-    }
-
-    return truncatedText;
-  };
+   
 
   useEffect(() => {
-    setLoading(true);
-
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get(All_BLOGS_URL, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${token}`,
           },
         });
 
         if (response.data.data.blogs) {
         
-          const truncatedPosts = response.data.data.blogs
-          .slice(0, 3)
-          .map((post) => ({
-            ...post,
-            content: truncateText(post.content, 20),
-          }));
-        setPosts(truncatedPosts);
+          // const truncatedPosts = response.data.data.blogs
+          // .slice(0, 3)
+          // .map((post) => ({
+          //   ...post,
+          //   content: truncateText(post.content, 20),
+          // }));
+
+          setPosts(response.data.data.blogs);
         } else {
           console.error("Error fetching posts");
         }
 
-        setLoading(false);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error:", error);
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -71,7 +62,7 @@ function TopNewsAndFeaturedArticles() {
     return (
         <section className="section">
             <div className="section__container topnews-and-article">
-                <TopNews posts={posts} />
+                <TopNews posts={posts} isLoading={isLoading} setIsLoading={setIsLoading} />
                 <MostSearchedAndFeaturedArticles />
             </div>
         </section>

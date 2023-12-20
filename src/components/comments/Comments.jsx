@@ -8,13 +8,6 @@ import { HOST_URL } from "../../assets/js/help_func";
 
 const Comments = ({ toggleDropdown }) => {
 
-
-
-
-  
-
-
-
   // const CommentForm = ({ blogId, token }) => {
   const { user, token } = useAuthContext();
   const { id } = useParams(); // This retrieves the ID from the URL parameter
@@ -37,7 +30,7 @@ const Comments = ({ toggleDropdown }) => {
 
 
   const renderComments = commentPost.map((comment) => (
-    <article key={comment._id} className="p-6 text-base bg-white rounded-lg">
+    <article key={comment._id} style={{ zIndex: '2000000' }} className="p-6 text-base bg-white rounded-lg">
       <footer className="flex justify-between items-center mb-2">
         <div className="flex items-center">
           <p className="inline-flex items-center mr-3 text-lg dark:text-white font-semibold">

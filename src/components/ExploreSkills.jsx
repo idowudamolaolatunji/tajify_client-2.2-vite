@@ -31,7 +31,7 @@ function ExploreSkills() {
             </span>
 
             <Link to="/writer">
-              <ExploreButton>explore blog</ExploreButton>
+              <ExploreButton><Link to='/category'>Explore blog</Link></ExploreButton>
             </Link>
           </div>
         </div>

@@ -41,7 +41,7 @@ function Hero() {
               <span > creative service </span>
               for your path to  <br></br>
               <Typed
-                  strings={[" Success", " Wealth", " Accomplishment."]}
+                  strings={[" Success.", " Wealth.", " Accomplishment."]}
                   typeSpeed={50}
                   backSpeed={70}
                   loop

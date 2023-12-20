@@ -1,5 +1,6 @@
 import React from "react";
 import { PiArrowRightFill } from 'react-icons/pi';
+import { Link } from "react-router-dom";
 
 const jobsData = [
     {title: 'Senior Web Developer', text: '4 years Experience and Proficient with HTML, CSS, JavaScript. also have knowledge of PHP..'},
@@ -23,8 +24,8 @@ function Jobs({amount}) {
                 {!amount ? jobsData.map(job => {
                     return <div className="job__figure" key={job.title}>
                         <span className="job__title-head">
-                            <h3 className="job__title">{job.title}</h3>
-                            <a href="#"><PiArrowRightFill /></a>
+                            <Link to={'/coming-soon'}><h3 className="job__title">{job.title}</h3></Link>
+                            <Link to={'/coming-soon'}><PiArrowRightFill /></Link>
                         </span>
                         <p className="job__text">{job.text}</p>
                     </div>
@@ -32,8 +33,8 @@ function Jobs({amount}) {
                 amount ? jobsData.slice(0, amount).map(job => {
                     return <div className="job__figure" key={job.title}>
                         <span className="job__title-head">
-                            <h3 className="job__title">{job.title}</h3>
-                            <a href="#"><PiArrowRightFill /></a>
+                            <Link to={'/coming-soon'}><h3 className="job__title">{job.title}</h3></Link>
+                            <Link to={'/coming-soon'}><PiArrowRightFill /></Link>
                         </span>
                         <p className="job__text">{job.text}</p>
                     </div>

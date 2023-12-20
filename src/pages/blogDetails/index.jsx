@@ -10,7 +10,10 @@ import {
   AiFillTwitterSquare,
   AiFillHeart,
   AiOutlineHeart,
+  AiFillCheckCircle,
+  AiFillExclamationCircle,
 } from "react-icons/ai";
+import { FiCopy } from "react-icons/fi";
 import AvatarImg from "../../assets/images/pngs/avatar.png";
 import { BsPinterest } from "react-icons/bs";
 // import { PiHandsClappingThin } from "react-icons/pi";
@@ -19,23 +22,23 @@ import { IoShareOutline } from "react-icons/io5";
 import { AiOutlineComment } from "react-icons/ai";
 import { BsSave } from "react-icons/bs";
 import axios from "axios";
-// import "../../index.css";
 import "../../pages/blogDetails/blogDetails.css";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Footer from "../../components/Footer";
-import TreadingArticles from "../../components/TreadingArticles";
+import Cookies from "js-cookie";
 import { useAuthContext } from "../../context/AuthContext";
-import Profile from "../../components/Profile";
 // import Loader from "../../components/Loader";
 import LoaderSpiner from "../../components/LoaderSpinner";
 import Comments from "../../components/comments/Comments";
 import Notification from "../../components/notification/Notification";
-// import CategoryHead from "../Categories/categoriesComponents/CategoryHead";
-import CategoryBlogs from "../Categories/categoriesComponents/CategoryBlogs";
 import { HOST_URL } from "../../assets/js/help_func";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import Premium from "../../components/Premium";
+import BlogNavbar from "../../components/Navbar";
+
+/////////////////////////////////////////////////////////
+import Alert from "../../components/Alert";
 
 const BlogDetails = () => {
   const { user, token } = useAuthContext();
@@ -52,7 +55,7 @@ const BlogDetails = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const [isShared, setIsShared] = useState(false);
-  const [likes, setLikes] = useState(5);
+  const [likes, setLikes] = useState(post.likesCount || 0);
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -62,18 +65,60 @@ const BlogDetails = () => {
   const [relatedBlogs, setRelatedBlogs] = useState([]);
   const [error, setError] = useState(null);
   const [premium, setPremium] = useState(false);
+  const [matchedId, setMatchedId] = useState(null);
+  const [blogPostBought, setBlogPostBought] = useState([]);
+  const [truncatedContent, setTruncatedContent] = useState("");
 
-  // const SINGLE_BLOGS_URL = `http://localhost:3005/api/blogs/${id}`;
-  const USER_URL = `${HOST_URL()}/users/${id}`; // Replace with your actual API endpoint
-  // const USER_URL = `https://api.tajify.com/api/users/username/${id}`; // Replace with your actual API endpoint
-  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`; // Replace with your actual API endpoint
-  // const FOLLOW_USER_URL = "https://api.tajify.com/api/users/65158a3db5daafe0fef241b3/request-follow"; // Replace with your actual API
-  const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`; // Updated API URL
+  /////////////////////////////////////////////////////////////
+  const [showAlert, setShowAlert] = useState(false);
+  const [message, setMessage] = useState("");
 
-  console.log(id);
-  console.log(userId);
+  const USER_URL = `${HOST_URL()}/users/${id}`;
+  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`;
+  const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`;
+  const GET_USER_OBJ_URL = `${HOST_URL()}/users/getMyObj`;
   const SINGLE_BLOGS_URL = `${HOST_URL()}/blogs/${id}`;
   const SHARE_BLOGS_URL = `${HOST_URL()}/blogs/sharePost`;
+
+  const getCurrentUserUpdatedObj = async () => {
+    try {
+      const userObj = await axios.get(GET_USER_OBJ_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (userObj.data.data.user?.blogPostBought) {
+        const boughtBlogs = userObj.data.data.user?.blogPostBought;
+
+        const urlId = id;
+        console.log(urlId);
+
+        // Check if the id from the URL is in the array
+        if (boughtBlogs.includes(urlId)) {
+          setMatchedId(urlId);
+          setPremium(false);
+        }
+
+        setBlogPostBought(boughtBlogs);
+      } else {
+        console.error("Error fetching user object");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  console.log(blogPostBought);
+  console.log(matchedId);
+  // console.log(id);
+  // console.log(userId);
+  // console.log(creator);
+  // console.log(premium);
+  // console.log(relatedBlogs);
+  // console.log(post.creator?.image);
+  // console.log(post);
+  // console.log(creatorslug);
 
   // AUTHORIZATION
   const headers = {
@@ -141,8 +186,6 @@ const BlogDetails = () => {
     }
   };
 
-  console.log(creatorslug);
-
   // FOLLOW A USER
   const handleFollowClick = async () => {
     try {
@@ -161,21 +204,16 @@ const BlogDetails = () => {
     }
   };
 
-  // FUNCTION TO TOGGLE LIKE
-  const toggleLike = () => {
-    // Simulate toggling the like on the client side
-    if (liked) {
-      setLikes(likes - 1);
-    } else {
-      setLikes(likes + 1);
-    }
-
-    // Toggle liked state
-    setLiked(!liked);
-
-    // Make an API request to the server to update the like status
-    // You'll need to implement this part on your Node.js server
-  };
+  function copyInput() {
+    navigator.clipboard.writeText(`https://${referralUrlWithWWW}`);
+    setShowAlert(true);
+    setMessage("Link Copied!");
+    setTimeout(() => {
+      setShowAlert(false);
+      setMessage("");
+    }, 2000);
+  }
+  ///////////////////////////////////////////////////////
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -220,6 +258,19 @@ const BlogDetails = () => {
           // Handle the fetched data and set it in state
           setPost(response.data.data.blog);
           setPremium(response.data.data.blog.isPremium);
+          // Truncate the content and store it in state
+          const maxLength = 200; // You can adjust the desired length
+          const truncated = truncateText(
+            response.data.data.blog.content,
+            maxLength
+          );
+          setTruncatedContent(truncated);
+
+          // Set post state
+          setPost({
+            ...blogData,
+            content: JSON.parse(truncatedContent),
+          });
         } else {
           console.error("Error fetching posts");
         }
@@ -234,9 +285,10 @@ const BlogDetails = () => {
     fetchData();
   }, [id, token]);
 
-  // const premium = (post.isPremium)
+  // Set id and price as cookies
+  Cookies.set("singleBlogId", post._id);
+  Cookies.set("singleBlogPrice", post.subscriptionFee);
 
-  console.log(premium);
   //  Truncate text to either 1000 words or 10 lines
   const truncateText = (text, maxLength) => {
     const words = text.split(" ");
@@ -271,36 +323,10 @@ const BlogDetails = () => {
     }
   };
 
-  console.log(relatedBlogs);
-  console.log(post.creator?.image);
-
   useEffect(() => {
     fetchRelatedBlogs();
+    getCurrentUserUpdatedObj();
   }, []);
-
-  // FOR ALL CREATORS
-  // useEffect(() => {
-  //   // Fetch the list of creators from your API
-  //   // fetch("http://localhost:3005/api/users")
-  //   fetch("https://api.tajify.com/api/users")
-  //     // fetch(`https://api.tajify.com/api/users/username/${id}`)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       const users = data.data.users;
-  //       setCreators(users);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       setError(error);
-  //       setLoading(false);
-  //       console.error("Error fetching creators:", error);
-  //     });
-  // }, []);
 
   useEffect(() => {
     fetchData();
@@ -308,280 +334,322 @@ const BlogDetails = () => {
 
   {
     return (
-      <div className="blog__container">
-        <div className="header__style">
-          <Navbar />
-        </div>
+      <>
+        <div className="blog__container">
+          <BlogNavbar />
 
-        {loading ? (
-          <div className="loader__container">
-            <LoaderSpiner />
-          </div>
-        ) : post ? ( // Check if post is not null before rendering
-          <div key={post._id} className="blog__content">
-            <div className="content__container">
-              {/* <div className="ads__body">
+          {loading ? (
+            <div className="loader__container">
+              <LoaderSpiner />
+            </div>
+          ) : post ? ( // Check if post is not null before rendering
+            <div key={post._id} className="blog__content">
+              <div className="content__container">
+                {/* <div className="ads__body">
               <div className="ads__second">
                 <AdsSecond />
               </div>
             </div> */}
-              <div className="ads__box--big width-100">&nbsp;</div>
+                <div className="ads__box--big width-100">&nbsp;</div>
 
-              <div className="writers__stats">
-                <div className="writers__stats__container">
-                  <div className="img__and__details__container">
-                    <h1 className="blog__title">{post.title}</h1>
-                    <div className="img__and__details">
-                      <div>
-                        <div className="profile__comments">
-                          <div className="profile__photo">
-                            {/* <img src={creator.image} alt="Profile" className="" /> */}
-                            <img
-                              src={post.creator?.image}
-                              alt="creator's image"
-                              className=""
-                            />
-                          </div>
-                          <div>
-                            <Link to={`/${post.author}/blogs`}>
-                              <p className="blog__author font-bold text-[#F06]">
-                                {post.author}
-                              </p>
-                            </Link>
-                            <p className="blog__info">
-                              7 min &nbsp;
-                              {new Date(post.date).toLocaleString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleFollowClick}
-                        className="mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                      >
-                        {/* <button className="w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78"> */}
-                        {isFollowing ? "Unfollow" : "Follow"}
-                      </button>
-                    </div>
-                    <div className="img__and__details__2">
-                      <div className="blog__metrics">
-                        {/* <PiHandsClappingThin className="writer__icons" />
-                        <span>4.5k</span> */}
-                        <div className="reaction">
-                          {liked ? (
-                            <AiFillHeart
-                              onClick={toggleLike}
-                              className="writer__icons"
-                              style={{ color: "red" }}
-                            />
-                          ) : (
-                            <AiOutlineHeart
-                              className="writer__icons"
-                              style={{ color: "#F06" }}
-                              onClick={toggleLike}
-                            />
-                          )}
-                          {/* <span className="">{likes} likes</span> */}
-                          <span className="">{likes}</span>
-                        </div>
-                        <div className="reaction">
-                          {/* Render the comment icon and attach a click handler */}
-                          <div onClick={toggleDropdown} className="reaction">
-                            <AiOutlineComment
-                              className="writer__icons"
-                              style={{ color: "#F06" }}
-                              onClick={toggleDropdown}
-                            />
-
-                            {/* Render the comment count */}
-
-                            <span>2</span>
-                          </div>
-                        </div>
-                        <div className="reaction">
-                          <div className="reaction">
-                            <IoShareOutline
-                              className="writer__icons"
-                              style={{ color: "#F06" }}
-                              onClick={handleShare}
-                            />
-                            {isShared && <p>Post shared successfully!</p>}
-                          </div>
-                        </div>
-                        {premium && (
-                          <div className="premium">
-                            <Premium />
-                            <div className="subscription__fee">
-                              <Currency
-                                quantity={post.subscriptionFee}
-                                currency="NGN"
+                <div className="writers__stats">
+                  <div className="writers__stats__container">
+                    <div className="img__and__details__container">
+                      <h1 className="blog__title">{post.title}</h1>
+                      <div className="img__and__details">
+                        <div>
+                          <div className="profile__comments">
+                            <div className="profile__photo">
+                              {/* <img src={creator.image} alt="Profile" className="" /> */}
+                              <img
+                                src={post.creator?.image}
+                                alt="creator's image"
+                                className=""
                               />
                             </div>
+                            <div>
+                              <Link to={`/${post.author}/blogs`}>
+                                <p className="blog__author font-bold text-[#F06]">
+                                  {post.author}
+                                </p>
+                              </Link>
+                              <p className="blog__info">
+                                7 min &nbsp;
+                                {new Date(post.date).toLocaleString("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
                           </div>
-                        )}
+                        </div>
+                        <button
+                          onClick={handleFollowClick}
+                          className="mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        >
+                          {/* <button className="w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78"> */}
+                          {isFollowing ? "Unfollow" : "Follow"}
+                        </button>
+                      </div>
+                      <div className="img__and__details__2">
+                        <div className="blog__metrics">
+                          {/* <PiHandsClappingThin className="writer__icons" />
+                        <span>4.5k</span> */}
+                          <div className="reaction">
+                            {liked ? (
+                              <AiFillHeart
+                                // onClick={toggleLike}
+                                className="writer__icons post--like"
+                              />
+                            ) : (
+                              <AiOutlineHeart
+                                className="writer__icons"
+                                style={{ color: "#F06" }}
+                                // onClick={toggleLike}
+                              />
+                            )}
+                            {/* <span className="">{likes} likes</span> */}
+                            <span className="">{likes}</span>
+                          </div>
+                          <div className="reaction">
+                            {/* Render the comment icon and attach a click handler */}
+                            <div onClick={toggleDropdown} className="reaction">
+                              <AiOutlineComment
+                                className="writer__icons"
+                                style={{ color: "#F06" }}
+                                onClick={toggleDropdown}
+                              />
 
-                        {isDropdownOpen && (
-                          <Comments toggleDropdown={toggleDropdown} />
-                        )}
+                              {/* Render the comment count */}
+
+                              <span>2</span>
+                            </div>
+                          </div>
+                          <div className="reaction">
+                            <div className="reaction">
+                              <IoShareOutline
+                                className="writer__icons"
+                                style={{ color: "#F06" }}
+                                onClick={handleShare}
+                              />
+                              {isShared && <p>Post shared successfully!</p>}
+                            </div>
+                          </div>
+                          {premium && (
+                            <div className="premium">
+                              <Premium />
+                              <div className="subscription__fee">
+                                <Currency
+                                  quantity={post.subscriptionFee}
+                                  currency="NGN"
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {isDropdownOpen && (
+                            <Comments toggleDropdown={toggleDropdown} />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="blog__post--picture">
-                <div className="main__news__img">
-                  <img
-                    src={post.image}
-                    alt={`Image for ${post.title}`}
-                    className="align-middle w-full object-cover transition duration-300 ease-linear mb-5"
-                  />
+                <div className="blog__post--picture">
+                  <div className="main__news__img">
+                    <img
+                      src={post?.image}
+                      alt={`Image for ${post?.title}`}
+                      className="align-middle w-full object-cover transition duration-300 ease-linear mb-5"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="paragraph__container">
-                <p
-                  className="details__paragraph"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
-                />
-              </div>
 
-              <div className="membership">
-                <div className="referal__link">
-                  {/* <h2>
-                    Join Tajify with my referral link — <a>{post.author}</a>
-                  </h2> */}
-                  <h2>
-                    Join Tajify with my referral link —{" "}
-                    <a
-                      href={post.author}
+                <div className="paragraph__container">
+                  <div className="">
+                    {premium ? (
+                      <p
+                        className="details__paragraph "
+                        dangerouslySetInnerHTML={{
+                          __html: JSON.parse(truncatedContent),
+                        }}
+                      />
+                    ) : (
+                      // <p
+                      //   className="details__paragraph "
+                      //   dangerouslySetInnerHTML={{ __html: truncatedContent }}
+                      // />
+                      <p
+                        className="details__paragraph "
+                        dangerouslySetInnerHTML={{
+                          __html: JSON.parse(post.content),
+                        }}
+                      />
+                      // <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                    )}
+
+                    {premium && (
+                      <div className="subscription__fee flex items-center justify-evenly">
+                        This blog post is premium and cost{" "}
+                        <Currency
+                          quantity={post.subscriptionFee}
+                          currency="NGN"
+                        />
+                        <Link to="/online-payment">
+                          <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
+                            Subscribe
+                          </button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="membership">
+                  <div className="referal__link">
+                    <h2 className="link--text">
+                      Join Tajify with my referral link{" "}
+                      <FiCopy
+                        style={{ cursor: "pointer", color: "#555" }}
+                        onClick={copyInput}
+                      />
+                      {/* <a
+                      href={`https://${referralUrlWithWWW}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {post.author}
-                    </a>
-                  </h2>
-
-                  <h3 className="member">
-                    As a Tajify member, a portion of your membership fee goes to
-                    writers you read, and you get full access to every story…
-                  </h3>
-                  <span className="writer__link">{post.creator?.email}</span>
-                </div>
-                <div className="refferal__img">
-                  <img
-                    src={post.creator?.image}
-                    className="align-middle mb-5"
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="profile__container-main">
-                  <div className="profile__container">
-                    <div className="profile__news_img">
-                      <img src={post.creator?.image} className="profile__img" />
-                    </div>
+                      {referralUrlWithWWW}
+                    </a> */}
+                    </h2>
+                    <h3 className="member">
+                      As a Tajify member, a portion of your membership fee goes
+                      to writers you read, and you get full access to every
+                      story…
+                    </h3>
+                    <span className="writer__link">{post.creator?.email}</span>
                   </div>
-                  <div className="writers__container">
-                    <div className="profile__socials">
-                      <div className="profile__socials__1">
-                        <h3 className="font-bold text-[#F06]">{post.author}</h3>
-                        <ul className="socials__icons">
-                          <li>
-                            <a href="#" className="social__icon--link">
-                              <AiOutlineInstagram />
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="social__icon--link">
-                              <AiFillFacebook />
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="social__icon--link">
-                              <AiFillTwitterSquare />
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="social__icon--link">
-                              <BsPinterest />
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                      <div>
-                        <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
-                          Follow
-                        </button>
+                  <div className="refferal__img">
+                    <img
+                      src={post.creator?.image}
+                      className="align-middle mb-5"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="profile__container-main">
+                    <div className="profile__container">
+                      <div className="profile__news_img">
+                        <img
+                          src={post.creator?.image}
+                          className="profile__img"
+                        />
                       </div>
                     </div>
-                    <p>{post.creator?.bio}</p>
+                    <div className="writers__container">
+                      <div className="profile__socials">
+                        <div className="profile__socials__1">
+                          <h3 className="font-bold text-[#F06]">
+                            {post.author}
+                          </h3>
+                          <ul className="socials__icons">
+                            <li>
+                              <a href="#" className="social__icon--link">
+                                <AiOutlineInstagram />
+                              </a>
+                            </li>
+                            <li>
+                              <a href="#" className="social__icon--link">
+                                <AiFillFacebook />
+                              </a>
+                            </li>
+                            <li>
+                              <a href="#" className="social__icon--link">
+                                <AiFillTwitterSquare />
+                              </a>
+                            </li>
+                            <li>
+                              <a href="#" className="social__icon--link">
+                                <BsPinterest />
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                        <div>
+                          <button className="mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78">
+                            Follow
+                          </button>
+                        </div>
+                      </div>
+                      <p>{post.creator?.bio}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <p>No post found</p>
-        )}
+          ) : (
+            <p>No post found</p>
+          )}
 
-        <div className="content__container">
-          <div className="related__article">
-            <h4 className="related__article--heading">Related Posts</h4>
-            <div className="category__related--article-card">
-              <figure className="article__figure">
-                {relatedBlogs.map((post) => (
-                  <div key={post._id} className="lifestylee">
-                    <Link to={`/details/${post._id}`}>
-                      <div className="article__image--box">
-                        <img
-                          src={post.image}
-                          alt="image"
-                          className="article__image"
-                        />
-                      </div>
-                    </Link>
-                    <div className="article__content--box">
-                      <div className="article__author-info">
-                        <img
-                          src={post.creator.image}
-                          alt={`author image: ${AvatarImg}`}
-                          className="article-author__image"
-                        />
-                        <span className="author">
-                          <Link to={`/${post.author}/blogs`}>
-                            <h4 className="article__author">{post.author}</h4>
-                          </Link>
-                          <p className="article__time">{post.time}</p>
-                        </span>
-                        <HiOutlineDotsVertical
-                          style={{ cursor: "pointer", marginLeft: "auto" }}
-                        />
-                      </div>
-                      <h3 className="article__heading">{post.title}</h3>
-                      <div
-                        className="article__text"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                      ></div>
+          <div className="content__container">
+            <div className="related__article">
+              <h4 className="related__article--heading">Related Posts</h4>
+              <div className="category__related--article-card">
+                <figure className="article__figure">
+                  {relatedBlogs.map((post) => (
+                    <div key={post._id} className="lifestylee">
+                      <Link to={`/details/${post._id}`}>
+                        <div className="article__image--box">
+                          <img
+                            src={post.image}
+                            alt="image"
+                            className="article__image"
+                          />
+                        </div>
+                      </Link>
+                      <div className="article__content--box">
+                        <div className="article__author-info">
+                          <img
+                            src={post.creator?.image}
+                            alt={`author image: ${AvatarImg}`}
+                            className="article-author__image"
+                          />
+                          <span className="author">
+                            <Link to={`/${post.author}/blogs`}>
+                              <h4 className="article__author">
+                                {post?.author}
+                              </h4>
+                            </Link>
+                            <p className="article__time">{post?.time}</p>
+                          </span>
+                          <HiOutlineDotsVertical
+                            style={{ cursor: "pointer", marginLeft: "auto" }}
+                          />
+                        </div>
+                        <h3 className="article__heading">{post?.title}</h3>
+                        <div
+                          className="article__text"
+                          dangerouslySetInnerHTML={{ __html: post?.content }}
+                        ></div>
 
-                      <ArticleSocialInfo avatarImg={AvatarImg} />
+                        <ArticleSocialInfo avatarImg={AvatarImg} />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </figure>
+                  ))}
+                </figure>
+              </div>
             </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+
+        <Alert alertType={`${showAlert && "success"}`}>
+          {showAlert && <AiFillCheckCircle className="alert--icon" />}
+          <p>{message}</p>
+        </Alert>
+      </>
     );
     {
-      /* })
-    ) : (
-      <div>No creators found.</div>
-    ); */
     }
   }
 };

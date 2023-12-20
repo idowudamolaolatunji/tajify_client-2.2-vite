@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../settings/main.css";
 // import SubHeader from "../../components/MainHeader";
-import Navbar from "../../components/Navbar";
+import MainHeaderW from "../../components/MainHeaderW";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 
@@ -218,10 +218,10 @@ const Settings = () => {
 
   return (
     <div>
-      <div className="header__style">
-        {/* <SubHeader /> */}
+      {/* <div className="header__style">
         <Navbar />
-      </div>
+      </div> */}
+      <MainHeaderW />
       <div className="section__container--2 max-w-md mt-10 mx-auto px-4">
         {/* <div className="section__container--3"> */}
 
