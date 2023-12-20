@@ -38,6 +38,31 @@ export function dateConverter(givenDate) {
     }
 }
 
+
+export function formatLikes(likes) {
+    if (likes === 0) {
+        return 'No likes';
+    } else if (likes === 1) {
+        return '1 like';
+    } else if (likes < 1000) {
+        return `${likes} likes`;
+    } else if (likes < 10000) {
+        const rounded = Math.round(likes / 100) / 10;
+        return `${rounded}k`;
+    } else if (likes < 1000000) {
+        const rounded = Math.floor(likes / 1000);
+        return `${rounded}k`;
+    } else if (likes < 10000000) {
+        const rounded = Math.round(likes / 100000) / 10;
+        return `${rounded}m`;
+    } else {
+        const rounded = Math.round(likes / 1000000);
+        return `${rounded}m`;
+    }
+}
+
+
+
 export function truncateText (text, wordCount) {
     const words = text.split(' ');
     if (words.length > wordCount) {

@@ -39,7 +39,7 @@ import BlogNavbar from "../../components/Navbar";
 
 /////////////////////////////////////////////////////////
 import Alert from '../../components/Alert';
-import { dateConverter } from '../../utils/helper';
+import { dateConverter, formatLikes } from '../../utils/helper';
 
 
 const BlogDetails = () => {
@@ -72,21 +72,19 @@ const BlogDetails = () => {
   /////////////////////////////////////////////////////////////
   const [showAlert, setShowAlert] = useState(false);
   const [message, setMessage] = useState('');
-  // const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [followerStatus, setFollowerStatus] = useState('');
   const [postCreator, setpostCreator] = useState(null);
 
-
+  // MY RESET HANDLER FUNCTION
   function handleReset() {
     setIsError(false);
     setMessage('')
     setIsSuccess(false);
     setMessage();
   }
-
-  // HANDLE ON FETCH FAILURE
+  // HANDLE ON FAILURE
   function handleFailure(mess) {
     setIsError(true);
     setMessage(mess)
@@ -95,26 +93,15 @@ const BlogDetails = () => {
         setMessage('')
     }, 2000);
   }
-
+  ////////////////////////////////////////////////////////////
 
 
   const USER_URL = `${HOST_URL()}/users/${id}`;
-  const FOLLOW_USER_URL = `${HOST_URL()}/users/${userId}/request-follow`;
   const RELATED_BLOGS = `${HOST_URL()}/blogs/related-posts/${id}`;
-
-  console.log(id);
-  console.log(userId);
   const SINGLE_BLOGS_URL = `${HOST_URL()}/blogs/${id}`;
   const SHARE_BLOGS_URL = `${HOST_URL()}/blogs/sharePost`;
 
-  // AUTHORIZATION
-  const headers = {
-    // 'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  };
-
   // FUNCTION TO SHARE POST
-
   const handleShare = async () => {
     try {
       const response = await axios.post(SHARE_BLOGS_URL, {
@@ -174,40 +161,12 @@ const BlogDetails = () => {
     }
   };
 
-  console.log(post.creator)
-
-  // FOLLOW A USER
-  async function handleFollow() {
-    try {
-
-      handleReset();
-      const res = await fetch(`http://localhost:3005/api/users/${post.creator._id}/request-follow`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-      });
-      if(!res.ok) throw new Error('Something went wrong!');
-
-      const data = await res.json();
-      if(data.status !== 'success') {
-        throw new Error(data.message);
-      }
-      console.log(data);
-      
-
-    } catch (err) {
-      handleFailure(err.message)
-    }
-  };
-
   
   //////////////////////////////////////////////////////////
   useEffect(() => {
     async function fetchCurrPost() {
       try {
-        const res = await fetch(`http://localhost:3005/api/blogs/${post._id}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/${post._id}`, {
           method: 'GET',
           headers: {
             "Content-Type": 'application/json',
@@ -226,11 +185,11 @@ const BlogDetails = () => {
     fetchCurrPost()
   }, [post]);
 
-
+  // 
   useEffect(() => {
     async function fetchCreator() {
       try {
-        const res = await fetch(`http://localhost:3005/api/users/${post.creator._id}`, {
+        const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}`, {
           method: 'GET',
           headers: {
             "Content-Type": "application/json",
@@ -244,15 +203,14 @@ const BlogDetails = () => {
         const creator = data.data.user;
         if(creator.followerRequestsReceived.includes(user._id)) {
           setFollowerStatus('request sent');
-        }
-        if(creator.followerRequestsSent.includes(user._id)) {
+        } else if(creator.followerRequestsSent.includes(user._id)) {
           setFollowerStatus('follow back');
-        }
-        if(creator.following.includes(user._id)) {
+        } else if(creator.following.includes(user._id)) {
           setFollowerStatus('following')
-        }
-        if(creator.followers.includes(user._id)) {
+        }else if(creator.followers.includes(user._id)) {
           setFollowerStatus('follower')
+        } else {
+          setFollowerStatus(null)
         }
         setpostCreator(creator);
       } catch(err) {
@@ -260,18 +218,109 @@ const BlogDetails = () => {
       }
     }
     fetchCreator();
-  }, [post]);
+  }, [post, followerStatus]);
 
-  console.log(followerStatus);
+  // FOLLOW A USER
+  async function handleFollow() {
+    try {
 
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/request-follow`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus('request sent');
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch (err) {
+      handleFailure(err.message)
+    }
+  };
+
+  // CANCEL A FOLLOW REQUEST
+  async function handleCancelFollow() {
+    try {
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/cancle-follow-request`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus(null)
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch(err) {
+      handleFailure(err.message)
+    }
+  }
+
+  // UNFOLLOW A USER
+  async function handleCancelFollow() {
+    try {
+      handleReset();
+      const res = await fetch(`https://api.tajify.com/api/users/${post.creator._id}/cancle-follow-request`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+      });
+      if(!res.ok) throw new Error('Something went wrong!');
+      const data = await res.json();
+      if(data.status !== 'success') {
+        throw new Error(data.message);
+      }
+      setFollowerStatus(null)
+      setIsSuccess(true);
+      setMessage(data.message)
+      setTimeout(async function() {
+          setIsSuccess(false);
+          setMessage();
+      }, 1500);
+
+    } catch(err) {
+      handleFailure(err.message)
+    }
+  }
+
+  /*
+  router.post("/accept-follow/:id", authController.protected, userController.acceptFollowRequest);
+  router.post("/reject-follow/:id", authController.protected, userController.rejectFollowRequest);
+  router.post("/:id/unfollow", authController.protected, userController.unFollowUser);
+  */
   
   const toggleLike = async () => {
     setLiked(!liked);
 
-
     try {
       if (liked) {
-        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${post._id}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/unlike-post/${post._id}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": 'application/json',
@@ -283,7 +332,7 @@ const BlogDetails = () => {
         if(data.status !== 'success') throw new Error(data.message);
         setLikes(prev => prev - 1);
       } else {
-        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${post._id}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/like-post/${post._id}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": "application/json",
@@ -302,8 +351,6 @@ const BlogDetails = () => {
   };
 
   const referralUrlWithWWW = post.creator?.referralUrl ? `www.tajify.com/${post.creator.referralUrl}` : '';
-
-
   function copyInput() {
     navigator.clipboard.writeText(`https://${referralUrlWithWWW}`);
     setShowAlert(true);
@@ -383,10 +430,8 @@ const BlogDetails = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [id, token]);
-
 
 
   // Set id and price as cookies
@@ -420,7 +465,6 @@ const BlogDetails = () => {
             ...post,
             content: truncateText(post.content, 60),
           }));
-        // setBlogsCategory(response.data.data.blogs);
         setRelatedBlogs(truncatedPosts);
       } else {
         console.error("Error fetching posts");
@@ -438,7 +482,7 @@ const BlogDetails = () => {
     fetchData();
   }, [id, user, userId, token]);
 
-  {
+
     return (
       <>
       <div className="blog__container">
@@ -448,7 +492,7 @@ const BlogDetails = () => {
           <div className="loader__container">
             <LoaderSpiner />
           </div>
-        ) : post ? ( // Check if post is not null before rendering
+        ) : post ? ( 
           <div key={post._id} className="blog__content">
             <div className="content__container">
               {/* <div className="ads__body">
@@ -466,7 +510,6 @@ const BlogDetails = () => {
                       <div>
                         <div className="profile__comments">
                           <div className="profile__photo">
-                            {/* <img src={creator.image} alt="Profile" className="" /> */}
                             <img
                               src={post.creator?.image}
                               alt="creator's image"
@@ -480,43 +523,35 @@ const BlogDetails = () => {
                               </p>
                             </Link>
                             <p className="blog__info">
-                              {/* 7 min &nbsp;
-                              {new Date(post.date).toLocaleString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })} */}
+                              
                               {dateConverter(post.createdAt)}
                             </p>
                           </div>
                         </div>
                       </div>
                       <button
-                        onClick={followerStatus === null && handleFollow}
-                        className={`mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${followerStatus === 'request sent' ? 'request-sent' : ''} `}>
-                        {followerStatus === 'request sent' ? 'Request Sent!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
+                        onClick={followerStatus === null ? handleFollow : followerStatus === 'request sent' ? handleCancelFollow : ''}
+                        className={`mobile__button w-[166px] h-[40px] text-[#F06] border border-[#F06] hover:bg-[#F06] hover:text-white font-bold active:bg-[#F06] px-78 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 `}>
+                        {followerStatus === 'request sent' ? 'Cancel Request!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
                       </button>
                     </div>
                     <div className="img__and__details__2">
                       <div className="blog__metrics">
-                        {/* <PiHandsClappingThin className="writer__icons" />
-                        <span>4.5k</span> */}
                         <div className="reaction">
                           {liked ? (
                             <AiFillHeart
-                              // onClick={toggleLike}
+                              onClick={toggleLike}
                               className="writer__icons post--like"
                             />
                           ) : (
                             <AiOutlineHeart
                               className="writer__icons"
                               style={{ color: "#F06" }}
-                              // onClick={toggleLike}
+                              onClick={toggleLike}
                             />
                           )}
                           
-                          {/* <span className="">{likes} likes</span> */}
-                          <span className="">{likes} Like{likes !== 1 ? 's' : ''}</span>
+                          <span className="">{formatLikes(likes)}</span>
                         </div>
                         <div className="reaction">
                           {/* Render the comment icon and attach a click handler */}
@@ -575,16 +610,17 @@ const BlogDetails = () => {
               <div className="paragraph__container">
                 <div className="">
                   {premium ? (
-                    // <p>
-                    //   {truncatedContent}
-                    // </p>
                     <p
                       className="details__paragraph "
-                      dangerouslySetInnerHTML={{ __html: JSON.parse(truncatedContent) }}
+                      dangerouslySetInnerHTML={{ __html: truncatedContent }}
                     />
+                    // <p
+                    //   className="details__paragraph "
+                    //   dangerouslySetInnerHTML={{ __html: JSON.parse(truncatedContent) }}
+                    // />
                   ) : (
-                    // <p dangerouslySetInnerHTML={{ __html: post.content }} />
-                    <p dangerouslySetInnerHTML={{ __html: JSON.parse(post?.content) }} />
+                    <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                    // <p dangerouslySetInnerHTML={{ __html: JSON.parse(post?.content) }} />
                     // <p>{post?.content}</p>
                   )}
                   {premium && (
@@ -609,18 +645,10 @@ const BlogDetails = () => {
                  
                   <h2 className="link--text">
                     Join Tajify with my referral link <FiCopy style={{ cursor: 'pointer', color: '#555' }} onClick={copyInput} />
-                    {/* <a
-                      href={`https://${referralUrlWithWWW}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {referralUrlWithWWW}
-                    </a> */}
                   
                   </h2>
                   <h3 className="member">
-                    As a Tajify member, a portion of your membership fee goes to
-                    writers you read, and you get full access to every story…
+                    As a Tajify member, a portion of your membership fee goes to writers you read, and you get full access to every story…
                   </h3>
                   <span className="writer__link">{post.creator?.email}</span>
                 </div>
@@ -667,9 +695,9 @@ const BlogDetails = () => {
                       </div>
                       <div>
                         <button 
-                          onClick={followerStatus === null && handleFollow}
-                          className={`mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78 ${followerStatus === 'request sent' ? 'request-sent' : ''} `}>
-                          {followerStatus === 'request sent' ? 'Request Sent!' : followerStatus === 'follow back' ? 'Accept Request!' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
+                          onClick={followerStatus === null ? handleFollow : followerStatus === 'request sent' ? handleCancelFollow : ''}
+                          className={`mobile__button w-[166px] h-[40px] bg-[#F06] text-center text-white flex items-center cursor-pointer justify-center rounded-lg p-21 px-78 `}>
+                          {followerStatus === 'request sent' ? 'Cancel Request!' : followerStatus === 'follow back' ? 'Follow Request' : followerStatus === 'following' ? 'Following' : followerStatus === 'follower' ? 'Follower' : 'Follow' }
                         </button>
                       </div>
                     </div>
@@ -738,26 +766,20 @@ const BlogDetails = () => {
       </div>
 
 
-        <Alert alertType={`${showAlert && "success" }`}>
-            {showAlert && (
-              <AiFillCheckCircle className="alert--icon" />
-            )}
-            <p>{message}</p>
-        </Alert>
+      <Alert alertType={`${isSuccess || showAlert ? "success" : isError ? "error" : ""}`}>
+				{isSuccess || showAlert ? (
+					<AiFillCheckCircle className="alert--icon" />
+				) : isError ? (
+					<AiFillExclamationCircle className="alert--icon" />
+				) : (
+					""
+				)}
+				<p>{message}</p>
+			</Alert>
 
       </>
     );
-    {
-      /* })
-    ) : (
-      <div>No creators found.</div>
-    ); */
-    }
-  }
+  
 };
 
 export default BlogDetails;
-
-// const BlogDetailsContainer = styled.div`
-
-// `;

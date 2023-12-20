@@ -36,6 +36,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { LiaComments } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
+import { formatLikes } from "../utils/helper";
 
 function ArticleSocialInfo({
   avatarImg,
@@ -54,7 +55,7 @@ function ArticleSocialInfo({
   useEffect(() => {
     async function fetchCurrPost() {
       try {
-        const res = await fetch(`http://localhost:3005/api/blogs/${postId}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/${postId}`, {
           method: 'GET',
           headers: {
             "Content-Type": 'application/json',
@@ -78,7 +79,7 @@ function ArticleSocialInfo({
 
     try {
       if (liked) {
-        const res = await fetch(`http://localhost:3005/api/blogs/unlike-post/${postId}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/unlike-post/${postId}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": 'application/json',
@@ -90,7 +91,7 @@ function ArticleSocialInfo({
         if(data.status !== 'success') throw new Error(data.message);
         setLikes(prevLikes => prevLikes - 1);
       } else {
-        const res = await fetch(`http://localhost:3005/api/blogs/like-post/${postId}`, {
+        const res = await fetch(`https://api.tajify.com/api/blogs/like-post/${postId}`, {
           method: 'PATCH',
           headers: {
             "Content-Type": "application/json",
@@ -122,6 +123,7 @@ function ArticleSocialInfo({
     // Make an API request to the server to add the comment
     // You'll need to implement this part on your Node.js server
   };
+  const likeArr = String(likes).split('');
 
   return (
     <div className="article__social--info">
@@ -140,7 +142,7 @@ function ArticleSocialInfo({
         ) : (
           <AiOutlineHeart onClick={toggleLike} />
         )}
-        <p className="article__social--figure">{likes === 0 ? 'No' : likes} like{likes !== 1 ? 's' : ''}</p>
+        <p className="article__social--figure">{formatLikes(likes)}</p>
       </div>
       <Link to={`/details/${postId}?commentBar=true`}>
         <div className="social--info">

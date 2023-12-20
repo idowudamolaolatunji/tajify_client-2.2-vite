@@ -15,7 +15,7 @@
 	top: 0;
 	left: 0;
 	right: 0;
-	z-index: 100;
+	z-index: 1000 !important;
 	box-shadow: 0.2rem 0.6rem 4rem rgba(0, 0, 0, 0.1);
 }
 .logo__box {
