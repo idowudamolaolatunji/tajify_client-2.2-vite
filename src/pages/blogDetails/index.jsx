@@ -50,6 +50,8 @@ const BlogDetails = () => {
 
   const [loading, setLoading] = useState(false);
   const [post, setPost] = useState([]);
+  const [postContent, setPostContent] = useState([]);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(commentBar);
   const profileBoxRef = useRef(null); // Create a ref for the profile
   const [isFollowing, setIsFollowing] = useState(false);
@@ -261,16 +263,17 @@ const BlogDetails = () => {
           // Truncate the content and store it in state
           const maxLength = 200; // You can adjust the desired length
           const truncated = truncateText(
-            response.data.data.blog.content,
+            JSON.parse(response.data.data.blog.content),
             maxLength
           );
           setTruncatedContent(truncated);
 
           // Set post state
-          setPost({
-            ...blogData,
-            content: JSON.parse(truncatedContent),
-          });
+          setPostContent(response.data.data.blog.content);
+          // setPost({
+          //   ...blogData,
+          //   content: truncatedContent,
+          // });
         } else {
           console.error("Error fetching posts");
         }
@@ -469,23 +472,24 @@ const BlogDetails = () => {
                 <div className="paragraph__container">
                   <div className="">
                     {premium ? (
+                      // <p
+                      //   className="details__paragraph "
+                      //   dangerouslySetInnerHTML={{
+                      //     __html: JSON.parse(truncatedContent),
+                      //   }}
+                      // />
                       <p
                         className="details__paragraph "
-                        dangerouslySetInnerHTML={{
-                          __html: JSON.parse(truncatedContent),
-                        }}
+                        dangerouslySetInnerHTML={{ __html: truncatedContent }}
                       />
                     ) : (
                       // <p
                       //   className="details__paragraph "
-                      //   dangerouslySetInnerHTML={{ __html: truncatedContent }}
+                      //   dangerouslySetInnerHTML={{
+                      //     __html: JSON.parse(post.content),
+                      //   }}
                       // />
-                      <p
-                        className="details__paragraph "
-                        dangerouslySetInnerHTML={{
-                          __html: JSON.parse(post.content),
-                        }}
-                      />
+                      <p dangerouslySetInnerHTML={{ __html: postContent }} />
                       // <p dangerouslySetInnerHTML={{ __html: post.content }} />
                     )}
 
