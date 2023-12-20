@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../pages/blogDetails/blogDetails.css";
 import axios from "axios";
 // import CKEditor from "@ckeditor/ckeditor5-react";
@@ -14,21 +14,27 @@ import { Textarea, FormControl, FormLabel } from "@chakra-ui/react";
 import MainHeaderW from "../../components/MainHeaderW";
 import LoaderSpinner from "../../components/LoaderSpinner";
 import { HOST_URL } from "../../assets/js/help_func";
+import { useParams } from "react-router-dom";
 
 // const BLOG_POST_URL = "https://api.tajify.com/api/blogs"; // Replace with your actual API endpoint
-const BLOG_POST_URL = `${HOST_URL()}/blogs`; // Replace with your actual API endpoint
 
-const EditorPage = () => {
+const EditBlog = () => {
   const { token } = useAuthContext();
-  const [title, setTitle] = useState(""); // Blog post title
-  const [text, setText] = useState(""); // Blog post content
+  const { id } = useParams(); // This retrieves the ID from the URL parameter
+  const [post, setPost] = useState([]);
+
+  const [title, setTitle] = useState(); // Blog post title
+  const [content, setContent] = useState(""); // Blog post content
   const [category, setCategory] = useState(""); // Blog post category
   const [tags, setTags] = useState(""); // Blog post tags
   const [subscriptionFee, setSubscriptionFee] = useState(""); // Blog post tags
   const [isPremium, setIsPremium] = useState(""); // Blog post tags
-  const [image, setImage] = useState(); // Cloudinary image URL
+  const [image, setImage] = useState(""); // Cloudinary image URL
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const EDIT_BLOG_POST_URL = `${HOST_URL()}/blogs/${id}`; // Replace with your actual API endpoint
+  const SINGLE_BLOGS_URL = `${HOST_URL()}/blogs/${id}`;
 
   const handleEditorChange = (content, editor) => {
     console.log("Content was updated:", content);
@@ -72,25 +78,27 @@ const EditorPage = () => {
     }
   };
 
+  //   PUBLISH THE EDITED BLOG
   const handlePublish = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        BLOG_POST_URL,
-        // `${HOST_URL()}/blogs`,
+      const response = await axios.patch(
+        EDIT_BLOG_POST_URL,
         JSON.stringify({
           title: title,
           content: JSON.stringify(
             draftToHtml(convertToRaw(editorState.getCurrentContent()))
           ),
-          editable: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
+          editable: JSON.stringify(
+            convertToRaw(editorState.getCurrentContent())
+          ),
           category: category,
           subscriptionFee: subscriptionFee,
           isPremium: isPremium,
           image: image,
-          tags: tags.split(","),
+          //   tags: tags.split(","),
         }),
         {
           headers: {
@@ -101,12 +109,11 @@ const EditorPage = () => {
       );
       console.log(response);
 
-      if (response.status === 201) {
-        toast.success("Blog post created successfully!!");
-        console.log("Blog post created successfully!");
+      if (response.status === 200) {
+        toast.success("Blog post updated successfully!!");
+        console.log("Blog post updated successfully!");
         setLoading(false);
         setTitle("");
-        setText("");
         setCategory("");
         setTags("");
         setIsPremium("");
@@ -123,16 +130,52 @@ const EditorPage = () => {
     }
   };
 
-  // formdata.append(
-  //   "content",
-  //   JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-  // );
-  // formdata.append(
-  //   "html",
-  //   JSON.stringify(draftToHtml(convertToRaw(editorState.getCurrentContent())))
-  // );
+  //   FETCH THAT SINGLE BLOG TO BE EDITED
+  useEffect(() => {
+    setLoading(true);
+    window.scrollTo(0, 0); // Scroll to the top of the page
 
-  console.log(image);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(SINGLE_BLOGS_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.data.blog) {
+          // Handle the fetched data and set it in state
+          setPost(response.data.data.blog);
+          setTitle(response.data.data.blog.title);
+          setCategory(response.data.data.blog.category);
+          setTags(response.data.data.blog.tags);
+          setSubscriptionFee(response.data.data.blog.subscriptionFee);
+          setImage(response.data.data.blog.image);
+          setIsPremium(response.data.data.blog.isPremium);
+          setContent(response.data.data.blog.content);
+          setEditorState(
+            EditorState.createWithContent(
+              convertFromRaw(JSON.parse(response.data.data.blog.editable))
+            )
+          );
+
+          // Set post state
+          setPost(response.data.data.blog);
+        } else {
+          console.error("Error fetching posts");
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id, token]);
+
+  console.log(content);
 
   return (
     <div className="blog__container">
@@ -141,6 +184,7 @@ const EditorPage = () => {
 
       <div className="custom__width editor__width">
         <div className="display__col">
+          <h1 className="text-[28px] text-green-600">Edit Blog</h1>
           <input
             type="title"
             placeholder="Blog Title"
@@ -161,7 +205,6 @@ const EditorPage = () => {
                       <input
                         type="file"
                         name="image"
-                        // value={image}
                         onChange={handleImage}
                         className="opacity-0"
                       />
@@ -193,7 +236,7 @@ const EditorPage = () => {
                               onChange={handleImage}
                               className="opacity-0"
                             />
-                            <p className="pt-1 text-sm tracking-wider text-gray-400  group-hover:text-gray-600">
+                            <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
                               {image ? "Change photo" : "Select a photo"}
                             </p>
                           </div>
@@ -205,19 +248,6 @@ const EditorPage = () => {
               </div>
             </div>
           </div>
-          {/* 
-          <CKEditor
-            editor={ClassicEditor}
-            data={text}
-            config={{
-              height: 900,
-              resize_maxWidth: 300, // Set your desired height and width here
-            }}
-            onChange={(event, editor) => {
-              const data = editor.getData();
-              setText(data);
-            }}
-          /> */}
 
           <div className="mb-4 px-4">
             <p className="fat mb-3 text-white">Content</p>
@@ -259,7 +289,9 @@ const EditorPage = () => {
             onChange={(e) => setTags(e.target.value)}
           />
           <FormControl id="premium">
-           
+            {/* <FormLabel style={{ fontSize: "1.3rem" }}>
+              
+            </FormLabel> */}
             <select
               value={isPremium}
               onChange={(e) => setIsPremium(e.target.value)}
@@ -296,4 +328,4 @@ const EditorPage = () => {
   );
 };
 
-export default EditorPage;
+export default EditBlog;

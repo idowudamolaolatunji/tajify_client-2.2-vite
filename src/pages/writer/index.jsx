@@ -31,6 +31,19 @@ const Writer = () => {
   const [posts, setPosts] = useState([]);
 
 
+    //  Truncate text to either 1000 words or 10 lines
+    const truncateText = (text, maxLength) => {
+      const words = text.split(" ");
+      let truncatedText = words.slice(0, maxLength).join(" ");
+  
+      if (words.length > maxLength) {
+        truncatedText += " ...";
+      }
+  
+      return truncatedText;
+    };
+
+
   // FETCH ALL BLOGS
   useEffect(() => {
     setLoading(true);
@@ -46,7 +59,14 @@ const Writer = () => {
         if (response.data.data.blogs) {
           // Handle the fetched data and set it in state
 
-          setPosts(response.data.data.blogs.slice(0, 6));
+          // setPosts(response.data.data.blogs.slice(0, 6));
+          const truncatedPosts = response.data.data.blogs.slice(0, 6)
+          .slice(0, 3)
+          .map((post) => ({
+            ...post,
+            content: truncateText(post.content, 60),
+          }));
+        setPosts(truncatedPosts);
         } else {
           console.error("Error fetching posts");
         }

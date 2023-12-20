@@ -10,7 +10,7 @@ import ArticleSocialInfo from "../../components/ArticleSocialInfo";
 import { HOST_URL } from "../../assets/js/help_func";
 import { useAuthContext } from "../../context/AuthContext";
 
-const BOUGHT_BLOGS = `${HOST_URL()}/blogs/bought-blogs`; // Updated API URL
+const BOUGHT_BLOGS = `${HOST_URL()}/blogs/bought/bought-blogs`; // Updated API URL
 
 function AllBlogsLibrary() {
   const { token } = useAuthContext();
@@ -25,10 +25,10 @@ function AllBlogsLibrary() {
         },
       });
 
-      if (result.data?.boughtProducts) {
-        console.log(result.data?.boughtProducts);
+      if (result.data.data.boughtBlogs) {
+        console.log(result.data?.boughtBlogs);
 
-        setData(result.data?.boughtProducts);
+        setData(result.data.data.boughtBlogs);
       } else {
         console.error("Error fetching posts");
       }
@@ -36,6 +36,8 @@ function AllBlogsLibrary() {
       console.error("Error:", error);
     }
   };
+
+  console.log(data)
 
   useEffect(() => {
     fetchBlogsByCategory();
@@ -47,15 +49,16 @@ function AllBlogsLibrary() {
 
       <section className="trending-article__section">
         <div className="section__container">
-          <div className="article__cards">
-            {data.map((post) => (
+          <div className="article__cards flex">
+            {data.map((data) => (
               <figure className="article__figure">
-                <div key={post._id} className="lifestylee">
-                  <Link to={`/details/${post._id}`}>
+                <div key={data._id} className="lifestylee">
+                {/* <div className="lifestylee"> */}
+                  <Link to={`/details/${data._id}`}>
                     <div className="article__image--box">
                       <img
-                        src={post.image}
-                        alt="image"
+                        src={data.image}
+                        alt="image" 
                         className="article__image"
                       />
                     </div>
@@ -63,46 +66,29 @@ function AllBlogsLibrary() {
                   <div className="article__content--box">
                     <div className="article__author-info">
                       <img
-                        src={post.creator.image}
-                        alt={`author image: ${AvatarImg}`}
+                        src={data.creator.image}
+                        alt="author image"
                         className="article-author__image"
                       />
                       <span className="author">
-                        <h4 className="article__author">{post.author}</h4>
-                        <p className="article__time">{post.time}</p>
+                        <h4 className="article__author">{data.author}</h4>
+                        <p className="article__time">{data.time}</p>
                       </span>
-                      {/* {premium && (
-                        <div className="premium">
-                          <Premium />
-                          <div className="subscription__fee">
-                            <Currency
-                              quantity={post.subscriptionFee}
-                              currency="NGN"
-                            />
-                          </div>
-                        </div>
-                      )} */}
+                     
                       <HiOutlineDotsVertical
                         style={{ cursor: "pointer", marginLeft: "auto" }}
                       />
                     </div>
-                    <h3 className="article__heading">{post.title}</h3>
-                    <div
-                      className="article__text"
-                      dangerouslySetInnerHTML={{ __html: post.content }}
-                    ></div>
+                    <h3 className="article__heading">{data.title}</h3>
+                   
 
                     <ArticleSocialInfo
-                    //   avatarImg={AvatarImg}
-                    // articleComments={articleComments}
-                    // articleViews={articleViews}
-                    // articleLikes={articleLikes}
-                    // postId={post._id}
+                   
                     />
                   </div>
                 </div>
               </figure>
-            ))}
+            ))} 
           </div>
           <span className="button-more">
             <RiArrowDownDoubleFill />
