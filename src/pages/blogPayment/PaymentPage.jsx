@@ -50,9 +50,10 @@ const PaymentPage = () => {
       if (result.isConfirmed) {
         // User confirmed, proceed with deletion
         const response = await axios.post(
-          `${HOST_URL()}/blogs/checkout-blogs/taji/${singleBlogId}`,
+          `${HOST_URL()}/blogs/checkout-blog/${singleBlogId}`,
           JSON.stringify({
             amount: singleBlogPrice,
+            type: "taji"
           }),
           {
             headers: {
@@ -103,9 +104,10 @@ const PaymentPage = () => {
       if (result.isConfirmed) {
         // User confirmed, proceed with deletion
         const response = await axios.post(
-          `${HOST_URL()}/market/checkout/usdt/${singleBlogId}`,
+          `${HOST_URL()}/blogs/checkout-blog/${singleBlogId}`,
           JSON.stringify({
             amount: singleBlogPrice,
+            type: "usdt"
           }),
           {
             headers: {
@@ -156,9 +158,10 @@ const PaymentPage = () => {
       if (result.isConfirmed) {
         // User confirmed, proceed with deletion
         const response = await axios.post(
-          `${HOST_URL()}/market/checkout/naira/${singleBlogId}`,
+            `${HOST_URL()}/blogs/checkout-blog/${singleBlogId}`,
           JSON.stringify({
             amount: singleBlogPrice,
+            type: "naira"
           }),
           {
             headers: {

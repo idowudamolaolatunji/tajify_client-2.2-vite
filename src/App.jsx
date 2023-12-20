@@ -33,6 +33,7 @@ import Library from "./pages/userArea/Library";
 import MyOrders from "./pages/userArea/MyOrders";
 import CreateBlog from "./pages/userArea/CreateBlog";
 import PaymentPage from "./pages/blogPayment/PaymentPage";
+import EditBlog from "./pages/editor/EditBlog";
 // import ThankYou from "./pages/thankyou/ThankYou";
 
 
@@ -42,6 +43,7 @@ function App() {
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route path="/editor" element={<EditorPage />}></Route>
+          <Route path="/edit-blog/:id" element={<EditBlog />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
           <Route path="/premium" element={<PremiumContent />}></Route>
           <Route path="/settings" element={<Settings />}></Route>

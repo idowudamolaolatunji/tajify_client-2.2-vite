@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { useAuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import Currency from "react-currency-formatter";
-import EditBlogModal from "./modals/EditBlogModal";
 import { useDisclosure } from "@chakra-ui/react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -18,7 +17,6 @@ const MySwal = withReactContent(Swal);
 
 const CreateBlog = () => {
   const { user, token } = useAuthContext();
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [myBlogIdToDelete, setMyBlogIdToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
   const [myblogs, setMyBlogs] = useState([]);
@@ -36,7 +34,13 @@ const CreateBlog = () => {
 
         if (response.status === 200) {
           console.log(response.data.data.blogs);
-          setMyBlogs(response.data.data.blogs);
+          const truncatedPosts = response.data.data.blogs
+          .map((post) => ({
+            ...post,
+            content: truncateText(post.content, 6),
+          }));
+          // setMyBlogs(response.data.data.blogs);
+          setMyBlogs(truncatedPosts);
         }
       } catch (error) {
         // Handle the error appropriately, e.g., log or show an error message
@@ -99,6 +103,17 @@ const CreateBlog = () => {
     }
   };
 
+  const truncateText = (text, maxLength) => {
+    const words = text.split(" ");
+    let truncatedText = words.slice(0, maxLength).join(" ");
+
+    if (words.length > maxLength) {
+      truncatedText += " ...";
+    }
+
+    return truncatedText;
+  };
+
   return (
     <>
       {loading}
@@ -135,12 +150,21 @@ const CreateBlog = () => {
                     className="w-[130px] h-[130px] max-sm:w-[80px]  max-sm:h-[80px] object-cover"
                   />
                   <div className="product-txt-div flex flex-col gap-[6px]">
-                    <p className="text-sm max-sm:text-xs h-[40px]">
+                    <p className="text-md max-sm:text-xs h-[40px]">
+                      {/* {blog.title} */}
                       {blog.title}
                     </p>
-                    <p className="">
-                      {blog.title}
-                    </p>
+                    <div className="article__author-info">
+                      <img
+                        src={blog.creator.image}
+                        alt={'author'}
+                        className="article-author__image"
+                      />
+                      <span className="author">
+                        <h4 className="article__author">{blog.author}</h4>
+                      </span>
+                    
+                    </div>
                     <p className="font-bold text-base max-sm:text-sm">
                       <Currency
                         quantity={blog.subscriptionFee}
@@ -151,21 +175,22 @@ const CreateBlog = () => {
                 </div>
                 {/* </Link> */}
 
-                <div className="flex justify-between w-[157px]">
+                <div className="flex justify-evenly w-[157px]">
+                  <Link to={`/edit-blog/${blog._id}`}>
                   <button
                     onClick={() => setIsEditProfileModalOpen(true)}
-                    className=" bg-[#FF0066] py-4 px-4 h-[30px] text-sm rounded-md font-semibold text-white flex items-center gap-2"
-                  >
+                    className=" bg-[#FF0066] py-4 px-4 h-[30px] text-md rounded-md font-semibold text-white flex items-center gap-2"
+                    >
                     Edit
                   </button>
+                    </Link>
                   <button
-                    // onClick={() =>    {setMyBlogIdToDelete(blog._id); handleDelete(myBlogId);}}
                     onClick={() => {
                       setMyBlogIdToDelete(blog._id);
                       handleDelete(blog._id);
                     }}
                     disabled={loading}
-                    className=" bg-[#008001] py-4 px-4 h-[30px] text-sm rounded-md font-semibold text-white flex items-center gap-2"
+                    className=" bg-[#008001] py-4 px-4 h-[30px] text-md rounded-md font-semibold text-white flex items-center gap-2"
                   >
                     {loading ? "Deleting..." : "Delete"}
                   </button>
@@ -175,12 +200,7 @@ const CreateBlog = () => {
           )}
         </div>
       </Dashboard>
-      <EditBlogModal
-        isOpen={isEditProfileModalOpen}
-        onClose={() => setIsEditProfileModalOpen(false)}
-        // singleProduct={singleProduct}
-        // myProductsId={myProductsId}
-      />
+    
     </>
   );
 };

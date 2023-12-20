@@ -451,11 +451,15 @@ const BlogDetails = () => {
                     // </p>
                     <p
                       className="details__paragraph "
-                      dangerouslySetInnerHTML={{ __html: JSON.parse(truncatedContent) }}
+                      dangerouslySetInnerHTML={{ __html: (truncatedContent) }}
                     />
+                    // <p
+                    //   className="details__paragraph "
+                    //   dangerouslySetInnerHTML={{ __html: JSON.parse(truncatedContent) }}
+                    // />
                   ) : (
-                    // <p dangerouslySetInnerHTML={{ __html: post.content }} />
-                    <p dangerouslySetInnerHTML={{ __html: JSON.parse(post?.content) }} />
+                    <p dangerouslySetInnerHTML={{ __html: post.content }} />
+                    // <p dangerouslySetInnerHTML={{ __html: JSON.parse(post.content) }} />
                     // <p>{post?.content}</p>
                   )}
                   {premium && (
